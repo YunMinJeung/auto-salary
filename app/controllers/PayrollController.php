@@ -149,12 +149,12 @@ class PayrollController
 
     private function saveResult(array $result): void
     {
-        $detail = $result;
-        unset($detail['employee'], $detail['settings'], $detail['details'], $detail['reasons']);
+        $ownerId = Auth::ownerId();
 
         $existing = DB::fetchOne(
-            'SELECT id FROM payroll_results WHERE employee_id = ? AND period_start = ? AND period_end = ?',
-            [$result['employee']['id'], $result['period_start'], $result['period_end']]
+            'SELECT id FROM payroll_results
+             WHERE employee_id = ? AND owner_id = ? AND period_start = ? AND period_end = ?',
+            [$result['employee']['id'], $ownerId, $result['period_start'], $result['period_end']]
         );
 
         $params = [
@@ -182,20 +182,20 @@ class PayrollController
                     base_pay=?, weekly_holiday_hours=?, weekly_holiday_pay=?,
                     night_premium=?, overtime_premium=?, holiday_premium=?,
                     total_pay=?, calculation_detail_json=?
-                WHERE id=?
-            ', array_merge($params, [$existing['id']]));
+                WHERE id=? AND owner_id=?
+            ', array_merge($params, [$existing['id'], $ownerId]));
         } else {
             DB::query('
                 INSERT INTO payroll_results
-                  (employee_id, period_start, period_end,
+                  (owner_id, employee_id, period_start, period_end,
                    total_work_minutes, break_minutes, paid_work_minutes,
                    night_minutes, overtime_minutes, holiday_minutes,
                    base_pay, weekly_holiday_hours, weekly_holiday_pay,
                    night_premium, overtime_premium, holiday_premium,
                    total_pay, calculation_detail_json)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             ', array_merge(
-                [$result['employee']['id'], $result['period_start'], $result['period_end']],
+                [$ownerId, $result['employee']['id'], $result['period_start'], $result['period_end']],
                 $params
             ));
         }

@@ -13,6 +13,11 @@ function render(string $view, array $viewData = [], string $layout = 'layout'): 
     }
 }
 
+function render_auth(string $view, array $viewData = []): void
+{
+    render($view, $viewData, 'auth_layout');
+}
+
 function h(?string $str): string
 {
     return htmlspecialchars((string) $str, ENT_QUOTES, 'UTF-8');

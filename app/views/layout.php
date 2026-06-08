@@ -51,6 +51,16 @@
             <i class="bi bi-gear-fill"></i>
           </a>
         </li>
+        <?php if ($authUser = Auth::user()): ?>
+        <li class="nav-item ms-lg-2 d-flex align-items-center">
+          <span class="navbar-text small me-2" style="color:var(--c-cream);opacity:.8">
+            <?= h($authUser['name']) ?>
+          </span>
+          <a href="<?= url('auth', 'logout') ?>" class="btn btn-sm btn-outline-light py-0">
+            <i class="bi bi-box-arrow-right me-1"></i>로그아웃
+          </a>
+        </li>
+        <?php endif; ?>
       </ul>
     </div>
   </div>

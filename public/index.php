@@ -9,6 +9,7 @@ define('APP_PATH',  ROOT_PATH . '/app');
 require APP_PATH . '/config.php';
 require APP_PATH . '/db.php';
 require APP_PATH . '/helpers.php';
+require APP_PATH . '/Auth.php';
 
 // 모델 / 컨트롤러 오토로드
 spl_autoload_register(function (string $class): void {
@@ -27,16 +28,30 @@ spl_autoload_register(function (string $class): void {
 $c = $_GET['c'] ?? '';
 $a = $_GET['a'] ?? 'index';
 
-// 유효한 액션 문자만 허용 (경로 트래버설 방지)
+// 유효한 문자만 허용 (경로 트래버설 방지)
 $c = preg_replace('/[^a-z_]/', '', $c);
 $a = preg_replace('/[^a-z_]/', '', $a);
 
 try {
+    // ─── 인증 라우트 (로그인 불필요) ─────────────────────────
+    if ($c === 'auth') {
+        $ctrl = new AuthController();
+        switch ($a) {
+            case 'register': $ctrl->register(); break;
+            case 'logout':   $ctrl->logout();   break;
+            default:         $ctrl->login();    break;
+        }
+        exit;
+    }
+
+    // ─── 이하 모든 라우트는 로그인 필요 ─────────────────────
+    Auth::requireLogin();
+
     switch ($c) {
         case '':
         case 'dashboard':
-            $settings  = Setting::get();
-            $employees = Employee::all();
+            $settings   = Setting::get();
+            $employees  = Employee::all();
             $recentLogs = WorkLog::recentAll(10);
             render('dashboard', [
                 'title'      => '대시보드',

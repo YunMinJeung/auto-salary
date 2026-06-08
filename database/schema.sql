@@ -1,11 +1,25 @@
 -- 소규모 자영업자용 급여·주휴수당 계산 시스템
--- MySQL / MariaDB
+-- MySQL / MariaDB  —  멀티테넌트 구조 (owner_id 기반 데이터 격리)
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
+-- ─── 사용자 (점주) ──────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `email` VARCHAR(255) NOT NULL,
+  `password_hash` VARCHAR(255) NOT NULL,
+  `name` VARCHAR(100) NOT NULL,
+  `role` ENUM('owner','admin') NOT NULL DEFAULT 'owner',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY `uq_email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─── 사업장 설정 (점주별 1건) ────────────────────────────────
 CREATE TABLE IF NOT EXISTS `settings` (
   `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `owner_id` INT NOT NULL,
   `business_name` VARCHAR(100) NOT NULL DEFAULT '내 사업장',
   `employee_count_type` ENUM('under5','over5') NOT NULL DEFAULT 'over5',
   `minimum_wage_year` INT NOT NULL DEFAULT 2026,
@@ -16,13 +30,15 @@ CREATE TABLE IF NOT EXISTS `settings` (
   `auto_break_enabled` TINYINT(1) NOT NULL DEFAULT 1,
   `auto_weekly_holiday_enabled` TINYINT(1) NOT NULL DEFAULT 1,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY `uq_owner_settings` (`owner_id`),
+  FOREIGN KEY (`owner_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `settings` (`business_name`) VALUES ('내 사업장');
-
+-- ─── 직원 ───────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS `employees` (
   `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `owner_id` INT NOT NULL,
   `name` VARCHAR(100) NOT NULL,
   `hourly_wage` INT NOT NULL DEFAULT 10320,
   `employment_start_date` DATE NOT NULL,
@@ -32,11 +48,14 @@ CREATE TABLE IF NOT EXISTS `employees` (
   `weekly_holiday_enabled` TINYINT(1) NOT NULL DEFAULT 1,
   `memo` TEXT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`owner_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ─── 근무 기록 ──────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS `work_logs` (
   `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `owner_id` INT NOT NULL,
   `employee_id` INT NOT NULL,
   `work_date` DATE NOT NULL,
   `start_time` TIME NOT NULL,
@@ -50,11 +69,14 @@ CREATE TABLE IF NOT EXISTS `work_logs` (
   `memo` TEXT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`owner_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`employee_id`) REFERENCES `employees`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ─── 급여 계산 결과 ─────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS `payroll_results` (
   `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `owner_id` INT NOT NULL,
   `employee_id` INT NOT NULL,
   `period_start` DATE NOT NULL,
   `period_end` DATE NOT NULL,
@@ -74,24 +96,8 @@ CREATE TABLE IF NOT EXISTS `payroll_results` (
   `calculation_detail_json` TEXT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`owner_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`employee_id`) REFERENCES `employees`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- 샘플 직원 (주 소정근로시간 20시간, 시급 10,320원)
-INSERT INTO `employees`
-  (`name`, `hourly_wage`, `employment_start_date`, `weekly_scheduled_days`, `weekly_scheduled_hours`)
-VALUES
-  ('홍길동 (샘플)', 10320, '2026-01-01', 5, 20.00);
-
--- 샘플 근무기록: 2026-06-01(월)~06-05(금) 18:00~22:00, 06-06(토) 21:00~02:00 야간 테스트
-INSERT INTO `work_logs`
-  (`employee_id`, `work_date`, `start_time`, `end_time`, `break_auto`)
-VALUES
-  (1, '2026-06-01', '18:00:00', '22:00:00', 1),
-  (1, '2026-06-02', '18:00:00', '22:00:00', 1),
-  (1, '2026-06-03', '18:00:00', '22:00:00', 1),
-  (1, '2026-06-04', '18:00:00', '22:00:00', 1),
-  (1, '2026-06-05', '18:00:00', '22:00:00', 1),
-  (1, '2026-06-06', '21:00:00', '02:00:00', 0);
 
 SET FOREIGN_KEY_CHECKS = 1;
