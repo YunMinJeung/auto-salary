@@ -45,6 +45,12 @@
             <i class="bi bi-bar-chart-fill me-1"></i>월간 요약
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link <?= ($_GET['c'] ?? '') === 'severance' ? 'active' : '' ?>"
+             href="<?= url('severance') ?>">
+            <i class="bi bi-bank me-1"></i>퇴직금
+          </a>
+        </li>
         <li class="nav-item ms-lg-2">
           <a class="nav-link nav-settings <?= ($_GET['c'] ?? '') === 'settings' ? 'active' : '' ?>"
              href="<?= url('settings') ?>">

@@ -90,6 +90,11 @@ try {
             }
             break;
 
+        case 'severance':
+            $ctrl = new SeveranceController();
+            $ctrl->index();
+            break;
+
         case 'settings':
             $ctrl = new SettingController();
             $ctrl->index();
