@@ -4,7 +4,7 @@ class AuthController
     public function login(): void
     {
         if (Auth::check()) {
-            redirect(url());
+            $this->redirectByRole();
         }
 
         $errors = [];
@@ -23,7 +23,8 @@ class AuthController
                     $errors[] = '이메일 또는 비밀번호가 올바르지 않습니다.';
                 } else {
                     Auth::login($user);
-                    redirect(url());
+                    $this->setupStoreSession($user);
+                    $this->redirectByRole();
                 }
             }
         }
@@ -37,7 +38,7 @@ class AuthController
     public function register(): void
     {
         if (Auth::check()) {
-            redirect(url());
+            $this->redirectByRole();
         }
 
         $errors = [];
@@ -51,8 +52,8 @@ class AuthController
                 'name'          => trim($_POST['name']          ?? ''),
                 'email'         => trim($_POST['email']         ?? ''),
             ];
-            $password        = $_POST['password']         ?? '';
-            $passwordConfirm = $_POST['password_confirm']  ?? '';
+            $password        = $_POST['password']        ?? '';
+            $passwordConfirm = $_POST['password_confirm'] ?? '';
 
             if (!$old['business_name']) $errors[] = '사업장 이름을 입력하세요.';
             if (!$old['name'])          $errors[] = '담당자 이름을 입력하세요.';
@@ -69,15 +70,22 @@ class AuthController
                     'role'     => 'owner',
                 ]);
 
-                // 가입과 동시에 사업장 기본 설정 생성
                 $user = User::find($userId);
                 Auth::login($user);
 
+                // 기본 설정 (payroll config)
                 DB::query(
                     "INSERT INTO settings (owner_id, business_name) VALUES (?, ?)",
                     [$userId, $old['business_name']]
                 );
 
+                // 사업장 원장 생성
+                $storeId = Store::create([
+                    'owner_id'   => $userId,
+                    'store_name' => $old['business_name'],
+                ]);
+
+                Auth::setStoreSession($storeId);
                 redirect(url());
             }
         }
@@ -93,5 +101,31 @@ class AuthController
     {
         Auth::logout();
         redirect(url('auth', 'login'));
+    }
+
+    // ── private helpers ──────────────────────────────────────
+
+    private function setupStoreSession(array $user): void
+    {
+        if (Auth::isOwner()) {
+            $store = Store::findByOwner($user['id']);
+            if ($store) {
+                Auth::setStoreSession($store['id']);
+            }
+        } elseif (Auth::isEmployee()) {
+            $member = StoreMember::findByUserId($user['id']);
+            if ($member) {
+                Auth::setStoreSession($member['store_id'], $member['id']);
+            }
+        }
+    }
+
+    private function redirectByRole(): void
+    {
+        if (Auth::isEmployee()) {
+            redirect(url('employee'));
+        } else {
+            redirect(url());
+        }
     }
 }

@@ -51,6 +51,18 @@
             <i class="bi bi-bank me-1"></i>퇴직금
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link <?= ($_GET['c'] ?? '') === 'attendance' ? 'active' : '' ?>"
+             href="<?= url('attendance') ?>">
+            <i class="bi bi-door-open me-1"></i>출퇴근
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link <?= ($_GET['c'] ?? '') === 'members' ? 'active' : '' ?>"
+             href="<?= url('members') ?>">
+            <i class="bi bi-person-badge me-1"></i>직원계정
+          </a>
+        </li>
         <li class="nav-item ms-lg-2">
           <a class="nav-link nav-settings <?= ($_GET['c'] ?? '') === 'settings' ? 'active' : '' ?>"
              href="<?= url('settings') ?>">

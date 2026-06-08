@@ -44,8 +44,26 @@ try {
         exit;
     }
 
-    // ─── 이하 모든 라우트는 로그인 필요 ─────────────────────
+    // ─── 알바생 전용 라우트 (employee 역할만) ────────────────
+    if ($c === 'employee') {
+        Auth::requireLogin();
+        $ctrl = new EmployeeDashboardController();
+        switch ($a) {
+            case 'clock_in':           $ctrl->clockIn();            break;
+            case 'clock_out':          $ctrl->clockOut();           break;
+            case 'request_correction': $ctrl->requestCorrection();  break;
+            default:                   $ctrl->index();              break;
+        }
+        exit;
+    }
+
+    // ─── 이하 모든 라우트는 점주 로그인 필요 ─────────────────
     Auth::requireLogin();
+
+    // 알바생이 점주 페이지 접근 시 자신의 대시보드로 리다이렉트
+    if (Auth::isEmployee()) {
+        redirect(url('employee'));
+    }
 
     switch ($c) {
         case '':
@@ -98,6 +116,29 @@ try {
         case 'settings':
             $ctrl = new SettingController();
             $ctrl->index();
+            break;
+
+        // ─── 출퇴근 관련 (점주) ──────────────────────────────
+        case 'attendance':
+            $ctrl = new OwnerAttendanceController();
+            switch ($a) {
+                case 'add_log':            $ctrl->addLog();             break;
+                case 'corrections':        $ctrl->corrections();        break;
+                case 'approve_correction': $ctrl->approveCorrection();  break;
+                case 'reject_correction':  $ctrl->rejectCorrection();   break;
+                default:                   $ctrl->index();              break;
+            }
+            break;
+
+        // ─── 직원 계정 관리 (점주) ───────────────────────────
+        case 'members':
+            $ctrl = new StoreMemberController();
+            switch ($a) {
+                case 'create': $ctrl->create(); break;
+                case 'edit':   $ctrl->edit();   break;
+                case 'delete': $ctrl->delete(); break;
+                default:       $ctrl->index();  break;
+            }
             break;
 
         default:
