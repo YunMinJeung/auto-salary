@@ -1,60 +1,336 @@
-/* 소규모 자영업자용 급여계산기 */
+/* ─── 디자인 토큰 ─────────────────────────────────────── */
+:root {
+  --c-dark:   #003844;
+  --c-teal:   #006C67;
+  --c-pink:   #F194B4;
+  --c-amber:  #FFB100;
+  --c-cream:  #FFEBC6;
 
+  --c-teal-hover:  #005550;
+  --c-teal-light:  #e6f2f1;
+  --c-pink-light:  #fdeef5;
+  --c-amber-light: #fff5d6;
+  --c-dark-muted:  #1a4f5c;
+
+  --radius-card: 0.875rem;
+  --shadow-card: 0 2px 12px rgba(0,56,68,.08);
+}
+
+/* ─── 전체 레이아웃 ──────────────────────────────────── */
 body {
-  background-color: #f8f9fa;
+  background-color: var(--c-cream);
   font-size: 0.95rem;
+  color: #1a1a1a;
+}
+
+/* ─── 네브바 ─────────────────────────────────────────── */
+.navbar.bg-primary,
+.bg-primary {
+  background-color: var(--c-dark) !important;
 }
 
 .navbar-brand {
-  letter-spacing: -0.5px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--c-cream) !important;
 }
 
+.navbar-brand i {
+  color: var(--c-pink);
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  color: rgba(255,235,198,.75);
+  border-radius: 0.375rem;
+  padding: 0.35rem 0.75rem;
+  transition: background .15s, color .15s;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link.active {
+  color: var(--c-cream);
+  background-color: rgba(255,255,255,.1);
+}
+
+.navbar-dark .navbar-nav .nav-link.active {
+  background-color: var(--c-teal);
+}
+
+/* ─── 카드 ───────────────────────────────────────────── */
 .card {
-  border-radius: 0.75rem;
+  border-radius: var(--radius-card) !important;
+  border: 1.5px solid rgba(0,56,68,.08) !important;
+  box-shadow: var(--shadow-card);
+  background-color: #fff;
 }
 
 .card-header {
-  border-radius: 0.75rem 0.75rem 0 0 !important;
-  border-bottom: 1px solid rgba(0,0,0,.08);
+  border-radius: var(--radius-card) var(--radius-card) 0 0 !important;
+  border-bottom: 1.5px solid rgba(0,56,68,.08) !important;
+  font-weight: 600;
 }
 
-/* 아주 작은 버튼 */
+/* 컬러 카드 헤더 (bg-primary) */
+.card-header.bg-primary {
+  background-color: var(--c-dark) !important;
+  color: var(--c-cream) !important;
+}
+
+.card-header.bg-primary .badge {
+  color: var(--c-dark) !important;
+}
+
+/* ─── 버튼 ───────────────────────────────────────────── */
+.btn-primary {
+  background-color: var(--c-teal);
+  border-color: var(--c-teal);
+  color: #fff;
+  font-weight: 600;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--c-teal-hover);
+  border-color: var(--c-teal-hover);
+  color: #fff;
+}
+.btn-primary:active {
+  background-color: #004440;
+  border-color: #004440;
+}
+
+.btn-success {
+  background-color: var(--c-teal);
+  border-color: var(--c-teal);
+  color: #fff;
+  font-weight: 600;
+}
+.btn-success:hover,
+.btn-success:focus {
+  background-color: var(--c-teal-hover);
+  border-color: var(--c-teal-hover);
+  color: #fff;
+}
+
+.btn-outline-primary {
+  color: var(--c-teal);
+  border-color: var(--c-teal);
+}
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  background-color: var(--c-teal);
+  border-color: var(--c-teal);
+  color: #fff;
+}
+
+.btn-outline-success {
+  color: var(--c-teal);
+  border-color: var(--c-teal);
+}
+.btn-outline-success:hover {
+  background-color: var(--c-teal);
+  border-color: var(--c-teal);
+  color: #fff;
+}
+
+.btn-outline-danger {
+  color: #c0394b;
+  border-color: #c0394b;
+}
+.btn-outline-danger:hover {
+  background-color: #c0394b;
+  border-color: #c0394b;
+  color: #fff;
+}
+
+/* ─── 컬러 텍스트 ────────────────────────────────────── */
+.text-primary  { color: var(--c-teal) !important; }
+.text-success  { color: var(--c-teal) !important; }
+.text-warning  { color: var(--c-amber) !important; }
+.text-warning-emphasis { color: #cc8e00 !important; }
+.text-info     { color: var(--c-dark) !important; }
+
+/* ─── 배지 ───────────────────────────────────────────── */
+.badge.bg-primary { background-color: var(--c-teal) !important; }
+.badge.bg-success { background-color: var(--c-teal) !important; }
+
+.badge.bg-success-subtle,
+.bg-success-subtle { background-color: var(--c-teal-light) !important; }
+.text-success.bg-success-subtle,
+.badge.bg-success-subtle.text-success { color: var(--c-teal) !important; }
+
+.badge.bg-danger-subtle  { background-color: #fde8ec !important; }
+.badge.bg-primary-subtle { background-color: var(--c-teal-light) !important; }
+.badge.text-primary      { color: var(--c-teal) !important; }
+
+/* 재직/퇴직 배지 */
+.border-success-subtle { border-color: var(--c-teal) !important; }
+.border-primary-subtle { border-color: var(--c-teal) !important; }
+
+/* ─── 알럿 ───────────────────────────────────────────── */
+.alert-success {
+  background-color: var(--c-teal-light);
+  border-color: var(--c-teal);
+  color: #004440;
+}
+.alert-success .alert-link { color: #003330; }
+
+.alert-info {
+  background-color: #e8f4f8;
+  border-color: #b8d9e2;
+  color: var(--c-dark);
+}
+.alert-info i { color: var(--c-teal); }
+.alert-info .alert-link { color: var(--c-teal); }
+
+.alert-warning {
+  background-color: var(--c-amber-light);
+  border-color: var(--c-amber);
+  color: #7a5200;
+}
+
+.alert-danger {
+  background-color: #fde8ec;
+  border-color: #f5a5b0;
+  color: #7c1a28;
+}
+
+/* ─── 테이블 ─────────────────────────────────────────── */
+thead.table-light th,
+.table-light {
+  background-color: #f0f7f6 !important;
+  color: #003844;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+
+.table-success td,
+.table-success {
+  background-color: var(--c-teal-light) !important;
+  color: #003333;
+}
+
+.table-danger td,
+.table-danger { background-color: #fde8ec !important; }
+
+.table > :not(caption) > * > * {
+  padding: 0.65rem 0.75rem;
+}
+
+/* ─── 폼 ─────────────────────────────────────────────── */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--c-teal);
+  box-shadow: 0 0 0 0.2rem rgba(0,108,103,.2);
+}
+
+.form-check-input:checked {
+  background-color: var(--c-teal);
+  border-color: var(--c-teal);
+}
+
+.form-check-input:focus {
+  border-color: var(--c-teal);
+  box-shadow: 0 0 0 0.2rem rgba(0,108,103,.2);
+}
+
+.form-switch .form-check-input:checked {
+  background-color: var(--c-teal);
+  border-color: var(--c-teal);
+}
+
+/* invalid 상태 */
+.form-control.is-invalid:focus {
+  border-color: #c0394b;
+  box-shadow: 0 0 0 0.2rem rgba(192,57,75,.2);
+}
+
+/* ─── 대시보드 stat 카드 ─────────────────────────────── */
+.stat-card {
+  border-left: 4px solid var(--c-teal) !important;
+}
+
+.card .fs-2.text-primary  { color: var(--c-dark) !important; }
+.card .fs-2.text-success  { color: var(--c-teal) !important; }
+
+/* ─── 네브바 토글 ────────────────────────────────────── */
+.navbar-toggler {
+  border-color: rgba(255,235,198,.3);
+}
+.navbar-toggler-icon {
+  filter: invert(1);
+}
+
+/* ─── 푸터 ───────────────────────────────────────────── */
+footer.bg-light {
+  background-color: #f5ede0 !important;
+  border-top-color: rgba(0,56,68,.12) !important;
+}
+footer .text-muted { color: #7a6045 !important; }
+
+/* ─── 아주 작은 버튼 ─────────────────────────────────── */
 .btn-xs {
   padding: 0.15rem 0.35rem;
   font-size: 0.75rem;
   border-radius: 0.25rem;
 }
 
-/* 테이블 헤더 강조 */
-thead.table-light th {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: #6c757d;
-}
-
-/* 툴팁 아이콘 */
-[data-bs-toggle="tooltip"] {
-  cursor: help;
-}
-
-/* 미리보기 박스 */
+/* ─── 급여 결과 미리보기 ─────────────────────────────── */
 #workPreview {
   font-size: 0.875rem;
+  background-color: var(--c-teal-light);
+  border-color: var(--c-teal) !important;
+  color: #003333;
 }
 
-/* 급여 결과 테이블 */
-.table-success td {
-  background-color: #d1e7dd !important;
+/* ─── 툴팁 아이콘 ────────────────────────────────────── */
+[data-bs-toggle="tooltip"] { cursor: help; }
+
+/* ─── 페이지 타이틀 ──────────────────────────────────── */
+h1.h3 { color: var(--c-dark); font-weight: 700; }
+
+/* ─── input-group 텍스트 ─────────────────────────────── */
+.input-group-text {
+  background-color: #f0f7f6;
+  border-color: #ced4da;
+  color: var(--c-dark);
 }
 
-/* 모바일 최적화 */
+/* ─── 리스트 그룹 ────────────────────────────────────── */
+.list-group-item-action:hover {
+  background-color: var(--c-teal-light);
+}
+
+/* ─── 주간 결과 총액 배지 ────────────────────────────── */
+.card-header .badge.bg-white {
+  background-color: var(--c-cream) !important;
+  color: var(--c-dark) !important;
+  font-size: 1rem !important;
+  padding: 0.4em 0.75em;
+}
+
+/* ─── 계산 사유 아이콘 ───────────────────────────────── */
+.bi-check-circle-fill.text-success { color: var(--c-teal) !important; }
+.bi-info-circle-fill.text-info     { color: var(--c-teal) !important; }
+.bi-exclamation-triangle-fill.text-warning { color: var(--c-amber) !important; }
+
+/* ─── 설정 아이콘 ────────────────────────────────────── */
+.nav-settings {
+  opacity: .7;
+  font-size: 1.1rem;
+}
+.nav-settings:hover,
+.nav-settings.active {
+  opacity: 1;
+  background-color: rgba(255,255,255,.12) !important;
+}
+
+/* ─── 히어로 배너 ────────────────────────────────────── */
+.rounded-4 { border-radius: 0.875rem !important; }
+
+/* ─── 모바일 ─────────────────────────────────────────── */
 @media (max-width: 576px) {
-  .container {
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-  h1.h3 {
-    font-size: 1.1rem;
-  }
+  .container { padding-left: 12px; padding-right: 12px; }
+  h1.h3 { font-size: 1.1rem; }
 }
