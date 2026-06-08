@@ -1,0 +1,60 @@
+/* 소규모 자영업자용 급여계산기 */
+
+body {
+  background-color: #f8f9fa;
+  font-size: 0.95rem;
+}
+
+.navbar-brand {
+  letter-spacing: -0.5px;
+}
+
+.card {
+  border-radius: 0.75rem;
+}
+
+.card-header {
+  border-radius: 0.75rem 0.75rem 0 0 !important;
+  border-bottom: 1px solid rgba(0,0,0,.08);
+}
+
+/* 아주 작은 버튼 */
+.btn-xs {
+  padding: 0.15rem 0.35rem;
+  font-size: 0.75rem;
+  border-radius: 0.25rem;
+}
+
+/* 테이블 헤더 강조 */
+thead.table-light th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #6c757d;
+}
+
+/* 툴팁 아이콘 */
+[data-bs-toggle="tooltip"] {
+  cursor: help;
+}
+
+/* 미리보기 박스 */
+#workPreview {
+  font-size: 0.875rem;
+}
+
+/* 급여 결과 테이블 */
+.table-success td {
+  background-color: #d1e7dd !important;
+}
+
+/* 모바일 최적화 */
+@media (max-width: 576px) {
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  h1.h3 {
+    font-size: 1.1rem;
+  }
+}
