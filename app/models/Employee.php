@@ -39,13 +39,17 @@ class Employee
 
     public static function create(array $data): int
     {
+        [$nt, $nv, $ot, $ov, $ht, $hv] = self::normalizePremiums($data);
         DB::query('
             INSERT INTO employees
               (owner_id, name, hourly_wage, employment_start_date, employment_end_date,
-               weekly_scheduled_days, weekly_scheduled_hours, weekly_holiday_enabled, memo)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+               weekly_scheduled_days, weekly_scheduled_hours, weekly_holiday_enabled, memo,
+               night_premium_type, night_premium_value,
+               overtime_premium_type, overtime_premium_value,
+               holiday_premium_type, holiday_premium_value)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ', [
-            Auth::ownerId(),          // 프론트 입력값 사용 금지 — 세션 기준
+            Auth::ownerId(),
             $data['name'],
             (int)   $data['hourly_wage'],
             $data['employment_start_date'],
@@ -54,6 +58,7 @@ class Employee
             (float) $data['weekly_scheduled_hours'],
             isset($data['weekly_holiday_enabled']) ? 1 : 0,
             $data['memo'] ?? null,
+            $nt, $nv, $ot, $ov, $ht, $hv,
         ]);
         return DB::lastInsertId();
     }
@@ -62,16 +67,23 @@ class Employee
 
     public static function update(int $id, array $data): void
     {
+        [$nt, $nv, $ot, $ov, $ht, $hv] = self::normalizePremiums($data);
         DB::query('
             UPDATE employees SET
-                name                   = ?,
-                hourly_wage            = ?,
-                employment_start_date  = ?,
-                employment_end_date    = ?,
-                weekly_scheduled_days  = ?,
-                weekly_scheduled_hours = ?,
-                weekly_holiday_enabled = ?,
-                memo                   = ?
+                name                    = ?,
+                hourly_wage             = ?,
+                employment_start_date   = ?,
+                employment_end_date     = ?,
+                weekly_scheduled_days   = ?,
+                weekly_scheduled_hours  = ?,
+                weekly_holiday_enabled  = ?,
+                memo                    = ?,
+                night_premium_type      = ?,
+                night_premium_value     = ?,
+                overtime_premium_type   = ?,
+                overtime_premium_value  = ?,
+                holiday_premium_type    = ?,
+                holiday_premium_value   = ?
             WHERE id = ? AND owner_id = ?
         ', [
             $data['name'],
@@ -82,9 +94,26 @@ class Employee
             (float) $data['weekly_scheduled_hours'],
             isset($data['weekly_holiday_enabled']) ? 1 : 0,
             $data['memo'] ?? null,
+            $nt, $nv, $ot, $ov, $ht, $hv,
             $id,
             Auth::ownerId(),
         ]);
+    }
+
+    private static function normalizePremiums(array $data): array
+    {
+        $result = [];
+        foreach (['night', 'overtime', 'holiday'] as $kind) {
+            $type  = $data["{$kind}_premium_type"]  ?? 'global';
+            $value = $data["{$kind}_premium_value"] ?? null;
+            if (!in_array($type, ['global', 'none', 'multiplier', 'fixed'], true)) {
+                $type = 'global';
+            }
+            $needsValue = ($type === 'multiplier' || $type === 'fixed');
+            $result[] = $type;
+            $result[] = ($needsValue && $value !== null && $value !== '') ? (float)$value : null;
+        }
+        return $result; // [nt, nv, ot, ov, ht, hv]
     }
 
     // ─── 삭제 (WHERE에 owner_id 포함) ─────────────────────────

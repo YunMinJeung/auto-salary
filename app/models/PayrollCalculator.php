@@ -110,10 +110,57 @@ class PayrollCalculator
         return round($paidWorkMinutes / 60 * $hourlyWage, 2);
     }
 
-    /** 가산수당: minutes / 60 × 시급 × rate (야간·연장·휴일 모두 50%) */
+    /** 가산수당: minutes / 60 × 시급 × rate */
     public function calculatePremiumPay(int $minutes, int $hourlyWage, float $rate = 0.5): float
     {
         return round($minutes / 60 * $hourlyWage * $rate, 2);
+    }
+
+    /**
+     * 직원별 가산수당 해석.
+     * type = global   : 사업장 설정 따름 (50% 가산)
+     * type = none     : 미적용
+     * type = multiplier: 시급 × (value - 1.0) 가산 (예: 1.2배 → 0.2배 가산)
+     * type = fixed    : 시간당 value원 고정 가산
+     */
+    private function resolvePremium(
+        string $kind,
+        array  $employee,
+        array  $settings,
+        int    $minutes
+    ): float {
+        if ($minutes === 0) return 0.0;
+
+        $type  = $employee["{$kind}_premium_type"]  ?? 'global';
+        $value = (float)($employee["{$kind}_premium_value"] ?? 0);
+        $wage  = (int)$employee['hourly_wage'];
+
+        switch ($type) {
+            case 'none':
+                return 0.0;
+            case 'multiplier':
+                return round($minutes / 60 * $wage * max(0.0, $value - 1.0), 2);
+            case 'fixed':
+                return round($minutes / 60 * $value, 2);
+            default: // global
+                return $settings["apply_{$kind}_premium"]
+                    ? $this->calculatePremiumPay($minutes, $wage)
+                    : 0.0;
+        }
+    }
+
+    /** 가산수당 설정을 사람이 읽기 쉬운 문자열로 변환 */
+    private function premiumLabel(string $kind, array $employee, array $settings): string
+    {
+        $type  = $employee["{$kind}_premium_type"]  ?? 'global';
+        $value = $employee["{$kind}_premium_value"];
+        switch ($type) {
+            case 'none':       return '미적용';
+            case 'multiplier': return number_format($value, 2) . '배';
+            case 'fixed':      return '+' . number_format((int)$value) . '원/시간';
+            default:
+                return $settings["apply_{$kind}_premium"] ? '50% 가산 (전역)' : '미적용 (전역)';
+        }
     }
 
     // ─── 주간 급여 통합 계산 ─────────────────────────────────
@@ -228,17 +275,11 @@ class PayrollCalculator
             );
         }
 
-        // 기본급 및 가산수당
-        $basePay        = $this->calculateBasePay($totalPaidMin, (int) $employee['hourly_wage']);
-        $nightPremium   = $settings['apply_night_premium']
-                          ? $this->calculatePremiumPay($totalNightMin, (int) $employee['hourly_wage'])
-                          : 0.0;
-        $overtimePremium = $settings['apply_overtime_premium']
-                          ? $this->calculatePremiumPay($overtimeMin, (int) $employee['hourly_wage'])
-                          : 0.0;
-        $holidayPremium = $settings['apply_holiday_premium']
-                          ? $this->calculatePremiumPay($totalHolidayMin, (int) $employee['hourly_wage'])
-                          : 0.0;
+        // 기본급 및 가산수당 (직원별 개별 설정 → 없으면 전역 설정 fallback)
+        $basePay         = $this->calculateBasePay($totalPaidMin, (int) $employee['hourly_wage']);
+        $nightPremium    = $this->resolvePremium('night',    $employee, $settings, $totalNightMin);
+        $overtimePremium = $this->resolvePremium('overtime', $employee, $settings, $overtimeMin);
+        $holidayPremium  = $this->resolvePremium('holiday',  $employee, $settings, $totalHolidayMin);
 
         $totalPay = $basePay + $weeklyHolidayPay + $nightPremium + $overtimePremium + $holidayPremium;
 
@@ -301,14 +342,18 @@ class PayrollCalculator
             $reasons[] = ['type' => 'info',    'text' => "주휴수당 시간 = min({$sched}, 40) ÷ 40 × 8 = {$weeklyHolidayHours}시간"];
         }
 
-        if ($settings['apply_night_premium']) {
-            $reasons[] = ['type' => 'info', 'text' => '사업장 설정에 따라 야간근로 가산수당(22:00~06:00, 50%)을 적용합니다.'];
-        } else {
-            $reasons[] = ['type' => 'muted', 'text' => '야간근로 가산수당이 설정에서 꺼져 있습니다.'];
-        }
-
-        if ($settings['apply_overtime_premium']) {
-            $reasons[] = ['type' => 'info', 'text' => '사업장 설정에 따라 연장근로 가산수당(50%)을 적용합니다.'];
+        // 야간·연장·휴일 가산수당 설명
+        foreach ([
+            ['night',    '야간근로 가산수당(22:00~06:00)'],
+            ['overtime', '연장근로 가산수당'],
+            ['holiday',  '휴일근로 가산수당'],
+        ] as [$kind, $label]) {
+            $lbl = $this->premiumLabel($kind, $employee, $settings);
+            $effective = $lbl !== '미적용' && $lbl !== '미적용 (전역)';
+            $reasons[] = [
+                'type' => $effective ? 'info' : 'muted',
+                'text' => "{$label}: {$lbl}",
+            ];
         }
 
         return $reasons;
