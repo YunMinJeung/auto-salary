@@ -19,18 +19,26 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // 날짜 입력 한국어 요일 표시
+  // 날짜 입력 한국어 요일 표시 — 레이블 옆에 붙여 컬럼 높이에 영향 없음
   document.querySelectorAll('input[type=date]').forEach(function (input) {
-    function showDow() {
-      if (!input.value) return;
-      const days = ['일', '월', '화', '수', '목', '금', '토'];
-      const d = new Date(input.value + 'T00:00:00');
-      const hint = input.parentElement.querySelector('.dow-hint');
-      if (hint) hint.textContent = '(' + days[d.getDay()] + ')';
+    var hint = document.createElement('small');
+    hint.className = 'dow-hint text-muted ms-1 fw-normal';
+
+    // 가장 가까운 컨테이너에서 label 찾기
+    var container = input.closest('.col, .col-12, .col-sm-5, .col-sm-4, .col-md-4, .col-md-5, .mb-3, .col-6');
+    var label = container ? container.querySelector('label') : null;
+    if (label) {
+      label.appendChild(hint);
+    } else {
+      input.insertAdjacentElement('afterend', hint);
     }
-    const hint = document.createElement('small');
-    hint.className = 'dow-hint text-muted ms-1';
-    input.insertAdjacentElement('afterend', hint);
+
+    function showDow() {
+      if (!input.value) { hint.textContent = ''; return; }
+      var days = ['일', '월', '화', '수', '목', '금', '토'];
+      var d = new Date(input.value + 'T00:00:00');
+      hint.textContent = '(' + days[d.getDay()] + ')';
+    }
     input.addEventListener('change', showDow);
     showDow();
   });
