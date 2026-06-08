@@ -42,14 +42,17 @@
           <div class="input-group">
             <input type="number" name="hourly_wage"
                    class="form-control <?= isset($errors['hourly_wage']) ? 'is-invalid' : '' ?>"
-                   value="<?= h($employee['hourly_wage'] ?? $settings['minimum_wage']) ?>"
+                   value="<?= h($employee['hourly_wage'] ?? MinimumWage::currentHourlyWage()) ?>"
                    min="1" required>
             <span class="input-group-text">원/시간</span>
             <?php if (isset($errors['hourly_wage'])): ?>
               <div class="invalid-feedback"><?= h($errors['hourly_wage']) ?></div>
             <?php endif; ?>
           </div>
-          <div class="form-text">최저시급 기준: <?= number_format($settings['minimum_wage']) ?>원</div>
+          <?php $curMinWage = MinimumWage::currentHourlyWage(); ?>
+          <div class="form-text">
+            <?= date('Y') ?>년 법정 최저시급: <?= number_format($curMinWage) ?>원
+          </div>
         </div>
 
         <div class="row g-3 mb-3">

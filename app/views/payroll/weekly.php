@@ -238,6 +238,21 @@
   </a>
 </form>
 
+<?php
+// 최저임금 미달 경고
+$empWage    = (int)($result['employee']['hourly_wage'] ?? 0);
+$minWageYear = (int) substr($periodStart, 0, 4);
+if ($empWage > 0 && $empWage < $periodMinWage):
+?>
+<div class="alert alert-danger mt-4 small">
+  <i class="bi bi-exclamation-triangle-fill me-1"></i>
+  <strong>최저임금 미달 경고:</strong>
+  이 직원의 시급(<?= number_format($empWage) ?>원)이
+  <?= $minWageYear ?>년 법정 최저시급(<?= number_format($periodMinWage) ?>원)보다 낮습니다.
+  <a href="<?= url('employees', 'edit', ['id' => $result['employee']['id']]) ?>" class="alert-link ms-1">시급 수정</a>
+</div>
+<?php endif; ?>
+
 <!-- 법적 안내 -->
 <div class="alert alert-warning mt-4 small">
   <i class="bi bi-exclamation-triangle-fill me-1"></i>

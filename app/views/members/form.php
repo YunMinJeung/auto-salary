@@ -47,11 +47,14 @@
           <label class="form-label fw-semibold">시급 <span class="text-danger">*</span></label>
           <div class="input-group">
             <input type="number" name="hourly_wage" class="form-control"
-                   value="<?= h($member['hourly_wage'] ?? $settings['minimum_wage']) ?>"
+                   value="<?= h($member['hourly_wage'] ?? MinimumWage::currentHourlyWage()) ?>"
                    min="1" required>
             <span class="input-group-text">원/시간</span>
           </div>
-          <div class="form-text">최저시급 기준: <?= number_format($settings['minimum_wage']) ?>원</div>
+          <?php $curMinWage = MinimumWage::currentHourlyWage(); ?>
+          <div class="form-text">
+            <?= date('Y') ?>년 법정 최저시급: <?= number_format($curMinWage) ?>원
+          </div>
         </div>
 
         <div class="row g-3 mb-3">

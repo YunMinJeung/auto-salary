@@ -38,15 +38,19 @@ class PayrollController
             ]));
         }
 
+        // 근무 기간 연도 기준 최저시급 조회 (최저임금 위반 경고용)
+        $periodMinWage = MinimumWage::effectiveHourlyWage($periodStart);
+
         render('payroll/weekly', [
-            'title'       => '주간 급여 계산',
-            'employees'   => $employees,
-            'employeeId'  => $employeeId,
-            'weekDate'    => $weekDate,
-            'periodStart' => $periodStart,
-            'periodEnd'   => $periodEnd,
-            'result'      => $result,
-            'settings'    => $settings,
+            'title'         => '주간 급여 계산',
+            'employees'     => $employees,
+            'employeeId'    => $employeeId,
+            'weekDate'      => $weekDate,
+            'periodStart'   => $periodStart,
+            'periodEnd'     => $periodEnd,
+            'result'        => $result,
+            'settings'      => $settings,
+            'periodMinWage' => $periodMinWage,
         ]);
     }
 

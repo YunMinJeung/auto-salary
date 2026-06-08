@@ -115,7 +115,11 @@ try {
 
         case 'settings':
             $ctrl = new SettingController();
-            $ctrl->index();
+            switch ($a) {
+                case 'min_wage_save':   $ctrl->minWageSave();   break;
+                case 'min_wage_delete': $ctrl->minWageDelete(); break;
+                default:                $ctrl->index();         break;
+            }
             break;
 
         // ─── 출퇴근 관련 (점주) ──────────────────────────────
