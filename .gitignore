@@ -1,6 +1,9 @@
 # DB 접속 정보 (배포 시 직접 수정)
 app/config.php
 
+# 환경 변수 / API 키
+.env
+
 # 에디터 / OS
 .DS_Store
 Thumbs.db
