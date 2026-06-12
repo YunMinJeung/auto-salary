@@ -74,7 +74,7 @@
             <span class="input-group-text">원</span>
           </div>
           <div id="minWageWarning" class="text-danger small mt-1" style="display:none">
-            <i class="bi bi-exclamation-circle-fill"></i> 2025년 최저임금(10,030원) 미만
+            <i class="bi bi-exclamation-circle-fill"></i> 2026년 최저임금(10,320원) 미만
           </div>
         </div>
         <div class="col-6 col-md-3">
@@ -140,7 +140,7 @@
 
 <script>
 (function () {
-  var MIN_WAGE = 10030;
+  var MIN_WAGE = 10320;
 
   var wageInput  = document.getElementById('hourlyWage');
   var hoursInput = document.getElementById('contractHours');
