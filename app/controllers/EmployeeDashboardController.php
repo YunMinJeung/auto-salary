@@ -10,8 +10,8 @@ class EmployeeDashboardController
 
         $member       = StoreMember::find($memberId, $storeId);
         if (!$member) {
-            Auth::logout();
-            redirect(url('auth', 'login'));
+            render_auth('employee/no_store', ['title' => '매장 연결 대기']);
+            exit;
         }
 
         // 점주 설정 (급여 공개)
