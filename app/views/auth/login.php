@@ -33,7 +33,7 @@
 
     <p class="text-center text-muted mb-0 small">
       계정이 없으신가요?
-      <a href="<?= url('auth', 'register') ?>" class="fw-semibold text-decoration-none" style="color:var(--c-teal)">
+      <a href="<?= url('signup') ?>" class="fw-semibold text-decoration-none" style="color:var(--c-teal)">
         회원가입
       </a>
     </p>
