@@ -3,7 +3,7 @@
   <h5 class="fw-bold mt-2"><?= h($inv['store_name']) ?></h5>
   <p class="text-muted">
     <strong><?= h($inv['invited_name']) ?></strong>님, 근무 초대가 도착했습니다.<br>
-    <small>시급 <?= number_format((int)$inv['hourly_wage']) ?>원 · 입사일 <?= h($inv['employment_start_date']) ?></small>
+    <small>시급 <?= number_format((int)$inv['hourly_wage']) ?>원 · 입사일 <?= h($inv['hire_date'] ?? '') ?></small>
   </p>
 </div>
 
