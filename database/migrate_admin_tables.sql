@@ -78,3 +78,6 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 
 -- users.role ENUM에 super_admin, employee 추가
 ALTER TABLE users MODIFY COLUMN role ENUM('owner','admin','super_admin','employee') NOT NULL DEFAULT 'owner';
+
+-- stores 테이블 status 컬럼 추가
+ALTER TABLE stores ADD COLUMN IF NOT EXISTS status ENUM('ACTIVE','SUSPENDED','DELETED') NOT NULL DEFAULT 'ACTIVE' AFTER owner_id;
