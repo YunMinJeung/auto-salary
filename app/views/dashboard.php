@@ -95,16 +95,26 @@ $needCheck = $riskTotal + (int)$pendingChangeCnt + (int)$correctionPendingCnt + 
           'completed', 'corrected' => ['class' => 'badge-done',    'label' => '퇴근 완료'],
           default     => ['class' => 'badge-check',   'label' => '확인 필요'],
         };
-        $inAt  = $log['effective_clock_in_at']  ?? $log['original_clock_in_at']  ?? null;
-        $outAt = $log['effective_clock_out_at'] ?? $log['original_clock_out_at'] ?? null;
-        $name  = $log['member_name'] ?? '';
-        $initial = mb_substr($name, 0, 1);
+        $inAt      = $log['effective_clock_in_at']  ?? $log['original_clock_in_at']  ?? null;
+        $outAt     = $log['effective_clock_out_at'] ?? $log['original_clock_out_at'] ?? null;
+        $name      = $log['member_name'] ?? '';
+        $initial   = mb_substr($name, 0, 1);
+        $lateMin   = (int)($log['late_minutes'] ?? 0);
+        $schedStart = $log['sched_start'] ?? null;
       ?>
       <div class="row-item">
         <div class="avatar"><?= h($initial) ?></div>
         <div class="flex-1">
-          <div class="row-name"><?= h($name) ?></div>
+          <div class="d-flex align-items-center gap-1 flex-wrap">
+            <span class="row-name"><?= h($name) ?></span>
+            <?php if ($lateMin > 0): ?>
+            <span class="badge bg-warning text-dark" style="font-size:.7rem">지각 +<?= $lateMin ?>분</span>
+            <?php endif; ?>
+          </div>
           <div class="row-sub">
+            <?php if ($schedStart): ?>
+              <span class="text-muted me-1">[예정 <?= h($schedStart) ?>]</span>
+            <?php endif; ?>
             <?= $inAt ? h(date('H:i', strtotime($inAt))) : '—' ?>
             ~ <?= $outAt ? h(date('H:i', strtotime($outAt))) : '근무 중' ?>
           </div>

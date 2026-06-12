@@ -35,6 +35,27 @@ class OwnerAttendanceController
         }
         unset($m);
 
+        // 오늘 스케줄 + 지각 분 계산
+        $todayScheds = Schedule::allForDate(Auth::ownerId(), $storeId, $today);
+        $schedByMember = [];
+        foreach ($todayScheds as $s) {
+            $schedByMember[(int)$s['employee_id']] = $s;
+        }
+        foreach ($allMembers as &$m) {
+            $m['schedule']     = $schedByMember[$m['id']] ?? null;
+            $m['late_minutes'] = 0;
+            $log = $m['today_logs'][0] ?? null;
+            if ($m['schedule'] && $log) {
+                $effIn = $log['effective_clock_in_at'] ?? $log['original_clock_in_at'] ?? null;
+                if ($effIn) {
+                    $schedStart = strtotime(date('Y-m-d') . ' ' . $m['schedule']['start_time']);
+                    $diff = (int)((strtotime($effIn) - $schedStart) / 60);
+                    if ($diff > 5) $m['late_minutes'] = $diff;
+                }
+            }
+        }
+        unset($m);
+
         render('attendance/owner', [
             'title'      => '오늘 출퇴근 현황',
             'today'      => $today,

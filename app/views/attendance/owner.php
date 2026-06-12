@@ -49,6 +49,86 @@ $laborCost = AttendanceLog::monthLaborCostForStore(Auth::storeId(), (int)date('Y
   </div>
 </div>
 
+<?php
+if (!function_exists('_gPct')) {
+    function _gPct(int $min, int $s, int $r): float { return max(0.0, min(100.0, ($min - $s) / $r * 100)); }
+    function _hm(string $t): int { [$h,$m] = explode(':', substr($t,0,5)); return (int)$h*60+(int)$m; }
+}
+$GS = 7*60; $GE = 24*60; $GR = $GE - $GS;
+?>
+<style>@keyframes gpulse{0%,100%{opacity:.82}50%{opacity:.4}}</style>
+
+<!-- 타임라인 -->
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
+    <span class="fw-semibold small"><i class="bi bi-bar-chart-steps me-1 text-primary"></i>오늘 근무 타임라인</span>
+    <span style="font-size:.72rem;color:#868e96"><?= date('n월 j일', strtotime($today)) ?> · 빨간선=현재</span>
+  </div>
+  <div class="card-body p-0">
+    <div style="display:flex;align-items:center;padding:3px 12px;background:#f8f9fa;border-bottom:1px solid #e9ecef">
+      <div style="width:108px;flex-shrink:0"></div>
+      <div style="flex:1;position:relative;height:16px">
+        <?php for ($gh=8;$gh<=24;$gh+=2): $gp=_gPct($gh*60,$GS,$GR); ?>
+        <span style="position:absolute;left:<?=$gp?>%;transform:translateX(-50%);font-size:.65rem;color:#adb5bd;white-space:nowrap"><?=$gh?>시</span>
+        <?php endfor; ?>
+      </div>
+      <div style="width:72px;flex-shrink:0"></div>
+    </div>
+
+    <?php
+    $nowPct = _gPct((int)date('H')*60+(int)date('i'), $GS, $GR);
+    foreach ($allMembers as $m):
+      $sched   = $m['schedule'] ?? null;
+      $log     = $m['today_logs'][0] ?? null;
+      $effIn   = $log ? ($log['effective_clock_in_at']  ?? $log['original_clock_in_at']  ?? null) : null;
+      $effOut  = $log ? ($log['effective_clock_out_at'] ?? $log['original_clock_out_at'] ?? null) : null;
+      $lateMin = (int)($m['late_minutes'] ?? 0);
+      $status  = $m['today_status'] ?? 'absent';
+      $barColor = $status==='working' ? '#3b82f6' : ($lateMin>5 ? '#f59e0b' : '#10b981');
+    ?>
+    <div style="display:flex;align-items:center;padding:4px 12px;border-bottom:1px solid #f1f3f5">
+      <div style="width:108px;flex-shrink:0;font-size:.78rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="<?=h($m['name'])?>"><?=h($m['name'])?></div>
+      <div style="flex:1;height:26px;background:#f3f4f6;border-radius:4px;position:relative;overflow:hidden">
+        <?php for ($gh=8;$gh<=24;$gh+=2): $gp=_gPct($gh*60,$GS,$GR); ?>
+        <div style="position:absolute;top:0;bottom:0;left:<?=$gp?>%;width:1px;background:rgba(0,0,0,.06)"></div>
+        <?php endfor; ?>
+        <?php if ($sched): $sl=_gPct(_hm($sched['start_time']),$GS,$GR); $sw=_gPct(_hm($sched['end_time']),$GS,$GR)-$sl; ?>
+        <div title="예정 <?=substr($sched['start_time'],0,5)?>~<?=substr($sched['end_time'],0,5)?>"
+             style="position:absolute;top:4px;height:18px;left:<?=number_format($sl,2)?>%;width:<?=number_format(max(.4,$sw),2)?>%;background:rgba(15,118,110,.13);border:1.5px solid rgba(15,118,110,.35);border-radius:3px"></div>
+        <?php endif; ?>
+        <?php if ($effIn): $al=_gPct(_hm(date('H:i',strtotime($effIn))),$GS,$GR); $aw=_gPct(_hm($effOut?date('H:i',strtotime($effOut)):date('H:i')),$GS,$GR)-$al; ?>
+        <div title="실제 <?=date('H:i',strtotime($effIn))?>~<?=$effOut?date('H:i',strtotime($effOut)):'근무중'?>"
+             style="position:absolute;top:1px;height:24px;left:<?=number_format($al,2)?>%;width:<?=number_format(max(.4,$aw),2)?>%;background:<?=$barColor?>;border-radius:3px;opacity:.82<?=$status==='working'?';animation:gpulse 2s ease-in-out infinite':''?>"></div>
+        <?php endif; ?>
+        <?php if ($nowPct>=0&&$nowPct<=100): ?>
+        <div style="position:absolute;top:0;bottom:0;left:<?=number_format($nowPct,2)?>%;width:2px;background:rgba(220,38,38,.65);z-index:5"></div>
+        <?php endif; ?>
+      </div>
+      <div style="width:72px;flex-shrink:0;text-align:right;line-height:1.3;padding-left:6px">
+        <?php if ($status==='working'): ?>
+          <span class="badge bg-success" style="font-size:.65rem">근무중</span>
+          <?php if ($lateMin>5): ?><div style="font-size:.64rem;color:#f59e0b;margin-top:1px">지각 <?=$lateMin?>분</div><?php endif; ?>
+        <?php elseif ($status==='completed'): ?>
+          <span class="badge bg-secondary" style="font-size:.65rem">퇴근</span>
+          <?php if ($lateMin>5): ?><div style="font-size:.64rem;color:#f59e0b;margin-top:1px">지각 <?=$lateMin?>분</div><?php endif; ?>
+        <?php elseif ($sched): ?>
+          <span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size:.65rem">미출근</span>
+        <?php else: ?>
+          <span style="color:#adb5bd;font-size:.67rem">예정 없음</span>
+        <?php endif; ?>
+      </div>
+    </div>
+    <?php endforeach; ?>
+
+    <div style="display:flex;gap:14px;padding:6px 12px 6px 132px;background:#f8f9fa;font-size:.7rem;color:#6c757d">
+      <span><i style="display:inline-block;width:12px;height:8px;background:rgba(15,118,110,.25);border:1.5px solid rgba(15,118,110,.4);border-radius:2px;margin-right:3px"></i>예정</span>
+      <span><i style="display:inline-block;width:12px;height:8px;background:#10b981;border-radius:2px;margin-right:3px"></i>정상</span>
+      <span><i style="display:inline-block;width:12px;height:8px;background:#3b82f6;border-radius:2px;margin-right:3px"></i>근무중</span>
+      <span><i style="display:inline-block;width:12px;height:8px;background:#f59e0b;border-radius:2px;margin-right:3px"></i>지각</span>
+    </div>
+  </div>
+</div>
+
 <!-- 직원 목록 -->
 <div class="card border-0 shadow-sm">
   <div class="card-header bg-white fw-semibold small d-flex justify-content-between">

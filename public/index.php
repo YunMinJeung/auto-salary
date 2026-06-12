@@ -159,6 +159,29 @@ try {
                 }
             }
 
+            // 오늘 스케줄 + 지각 분 계산 (대시보드 배지용)
+            $todayScheds = Schedule::allForDate(Auth::ownerId(), Auth::storeId(), date('Y-m-d'));
+            $dashSchedByMember = [];
+            foreach ($todayScheds as $_s) {
+                $dashSchedByMember[(int)$_s['employee_id']] = $_s;
+            }
+            foreach ($todayAttendance as &$_ta) {
+                $_ta['late_minutes'] = 0;
+                $_ta['sched_start']  = null;
+                $mid = (int)($_ta['store_member_id'] ?? 0);
+                $sc  = $dashSchedByMember[$mid] ?? null;
+                if ($sc) {
+                    $_ta['sched_start'] = substr($sc['start_time'], 0, 5);
+                    $effIn = $_ta['effective_clock_in_at'] ?? $_ta['original_clock_in_at'] ?? null;
+                    if ($effIn) {
+                        $schedTs = strtotime(date('Y-m-d') . ' ' . $sc['start_time']);
+                        $diff    = (int)((strtotime($effIn) - $schedTs) / 60);
+                        if ($diff > 5) $_ta['late_minutes'] = $diff;
+                    }
+                }
+            }
+            unset($_ta);
+
             // ── 차트 데이터 ──────────────────────────────────────
             // 월별 인건비 추이 (최근 6개월) — payroll_results 집계
             $monthlyPayrollTrend = DB::fetchAll(

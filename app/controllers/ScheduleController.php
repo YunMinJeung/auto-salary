@@ -8,16 +8,25 @@ class ScheduleController
         $weekDate = $_GET['week_date'] ?? date('Y-m-d');
         [$weekStart] = getWeekRange($weekDate);
 
-        $schedules = Schedule::allForWeek(Auth::ownerId(), Auth::storeId(), $weekStart);
-        $estimate  = Schedule::estimatedWeeklyPayroll(Auth::ownerId(), Auth::storeId(), $weekStart);
-        $employees = Employee::all();
+        $schedules     = Schedule::allForWeek(Auth::ownerId(), Auth::storeId(), $weekStart);
+        $estimate      = Schedule::estimatedWeeklyPayroll(Auth::ownerId(), Auth::storeId(), $weekStart);
+        $employees     = Employee::all();
+        $view          = in_array($_GET['view'] ?? '', ['month']) ? 'month' : 'week';
+        $calMonth      = $_GET['cal_month'] ?? substr($weekStart, 0, 7);
+        if (!preg_match('/^\d{4}-\d{2}$/', $calMonth)) {
+            $calMonth = substr($weekStart, 0, 7);
+        }
+        $monthSchedules = Schedule::allForMonth(Auth::ownerId(), Auth::storeId(), $calMonth);
 
         render('schedules/index', [
-            'title'     => '근무표',
-            'weekStart' => $weekStart,
-            'schedules' => $schedules,
-            'estimate'  => $estimate,
-            'employees' => $employees,
+            'title'          => '근무표',
+            'weekStart'      => $weekStart,
+            'schedules'      => $schedules,
+            'estimate'       => $estimate,
+            'employees'      => $employees,
+            'view'           => $view,
+            'calMonth'       => $calMonth,
+            'monthSchedules' => $monthSchedules,
         ]);
     }
 

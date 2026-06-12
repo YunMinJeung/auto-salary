@@ -5,6 +5,35 @@
  */
 class Schedule
 {
+    /** 특정 날짜 스케줄 — 직원명 JOIN. */
+    public static function allForDate(int $ownerId, int $storeId, string $date): array
+    {
+        return DB::fetchAll(
+            "SELECT s.*, sm.name AS employee_name
+               FROM schedules s
+               JOIN store_members sm ON sm.id = s.employee_id
+              WHERE s.owner_id=? AND s.store_id=? AND s.schedule_date=?
+              ORDER BY s.start_time",
+            [$ownerId, $storeId, $date]
+        );
+    }
+
+    /** 월간 스케줄 조회 — 직원명 JOIN. */
+    public static function allForMonth(int $ownerId, int $storeId, string $yearMonth): array
+    {
+        $start = $yearMonth . '-01';
+        $end   = date('Y-m-t', strtotime($start));
+        return DB::fetchAll(
+            "SELECT s.*, sm.name AS employee_name
+               FROM schedules s
+               JOIN store_members sm ON sm.id = s.employee_id
+              WHERE s.owner_id=? AND s.store_id=?
+                AND s.schedule_date BETWEEN ? AND ?
+              ORDER BY s.schedule_date, s.start_time",
+            [$ownerId, $storeId, $start, $end]
+        );
+    }
+
     /** 주간(월~일) 스케줄 조회 — 직원명 JOIN. */
     public static function allForWeek(int $ownerId, int $storeId, string $weekStart): array
     {
