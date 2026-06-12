@@ -38,7 +38,7 @@ $needCheck = $riskTotal + (int)$pendingChangeCnt + (int)$correctionPendingCnt + 
 </section>
 
 <!-- ── 핵심 지표 카드 4개 ──────────────────────────────── -->
-<div class="summary-grid">
+<div class="summary-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;">
 
   <a href="<?= url('members') ?>" class="summary-card" style="text-decoration:none;color:inherit">
     <div class="summary-icon-wrap icon-people">
