@@ -13,7 +13,6 @@ $today   = date('Y-m-d');
 $logs       = AttendanceLog::todayForStore($storeId, $today);
 $allMembers = StoreMember::allForStore($storeId, true);
 
-// 멤버별 오늘 상태 집계
 $logByMember = [];
 foreach ($logs as $log) {
     $mid = $log['store_member_id'];
@@ -36,14 +35,22 @@ foreach ($allMembers as $m) {
         $summary['completed']++;
     }
 
+    $effIn  = $log['effective_clock_in_at']  ?? null;
+    $effOut = $log['effective_clock_out_at'] ?? null;
+    $origIn  = $log ? $log['original_clock_in_at']  : null;
+    $origOut = $log ? ($log['original_clock_out_at'] ?? null) : null;
+
     $members[] = [
-        'id'               => $m['id'],
-        'name'             => $m['name'],
-        'hourly_wage'      => (int)$m['hourly_wage'],
-        'today_status'     => $status,
-        'clock_in_time'    => $log ? date('H:i', strtotime($log['clock_in_at'])) : null,
-        'clock_out_time'   => ($log && $log['clock_out_at']) ? date('H:i', strtotime($log['clock_out_at'])) : null,
-        'duration_minutes' => $log ? (int)$log['duration_minutes'] : 0,
+        'id'                    => $m['id'],
+        'name'                  => $m['name'],
+        'hourly_wage'           => (int)$m['hourly_wage'],
+        'today_status'          => $status,
+        'is_adjusted'           => $log ? (bool)($log['adjustment_count'] ?? 0) : false,
+        'clock_in_time'         => $effIn  ? date('H:i', strtotime($effIn))  : null,
+        'clock_out_time'        => $effOut ? date('H:i', strtotime($effOut)) : null,
+        'original_clock_in_time'  => $origIn  ? date('H:i', strtotime($origIn))  : null,
+        'original_clock_out_time' => $origOut ? date('H:i', strtotime($origOut)) : null,
+        'duration_minutes'      => $log ? (int)$log['duration_minutes'] : 0,
     ];
 }
 

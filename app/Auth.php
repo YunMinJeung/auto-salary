@@ -31,8 +31,8 @@ class Auth
     public static function storeId(): int
     {
         if (empty($_SESSION['store_id']) && self::isOwner()) {
-            $store = Store::findByOwner(self::ownerId());
-            if ($store) $_SESSION['store_id'] = $store['id'];
+            $stores = Store::allByOwner(self::ownerId());
+            if ($stores) $_SESSION['store_id'] = $stores[0]['id'];
         }
         return (int) ($_SESSION['store_id'] ?? 0);
     }
@@ -59,6 +59,11 @@ class Auth
         return (self::user()['role'] ?? '') === 'employee';
     }
 
+    public static function isSuperAdmin(): bool
+    {
+        return (self::user()['role'] ?? '') === 'super_admin';
+    }
+
     /** 로그인 처리 — session_regenerate_id로 세션 고정 공격 방지 */
     public static function login(array $user): void
     {
@@ -80,6 +85,16 @@ class Auth
         if ($storeMemberId !== null) {
             $_SESSION['store_member_id'] = $storeMemberId;
         }
+    }
+
+    /** 점주가 다른 매장으로 전환. 소유권 검증 후 세션 갱신. */
+    public static function switchStore(int $storeId): bool
+    {
+        if (!self::isOwner()) return false;
+        $store = Store::findOwned($storeId, self::ownerId());
+        if (!$store) return false;
+        $_SESSION['store_id'] = $storeId;
+        return true;
     }
 
     public static function logout(): void
@@ -113,6 +128,16 @@ class Auth
         self::requireLogin();
         if (!self::isEmployee()) {
             redirect(url());
+        }
+    }
+
+    public static function requireSuperAdmin(): void
+    {
+        self::requireLogin();
+        if (!self::isSuperAdmin()) {
+            http_response_code(403);
+            render('admin/403', ['title' => '접근 거부'], 'admin_layout');
+            exit;
         }
     }
 }

@@ -1,6 +1,16 @@
 <?php
 // API 엔드포인트 공통 부트스트랩
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path'     => '/',
+        'domain'   => '',
+        'secure'   => isset($_SERVER['HTTPS']),
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+    session_start();
+}
 
 define('ROOT_PATH', dirname(__DIR__, 2));
 define('APP_PATH',  ROOT_PATH . '/app');

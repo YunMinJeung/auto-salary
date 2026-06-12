@@ -1,0 +1,1 @@
+ALTER TABLE store_members ADD COLUMN IF NOT EXISTS date_of_birth DATE NULL DEFAULT NULL;

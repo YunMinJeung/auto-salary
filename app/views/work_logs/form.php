@@ -131,8 +131,23 @@
           </div>
           <div class="form-check">
             <input class="form-check-input" type="checkbox" id="is_early_leave" name="is_early_leave" value="1"
-                   <?= ($log['is_early_leave'] ?? 0) ? 'checked' : '' ?>>
+                   <?= ($log['is_early_leave'] ?? 0) ? 'checked' : '' ?>
+                   onchange="toggleEmployerEarly()">
             <label class="form-check-label" for="is_early_leave">조퇴</label>
+          </div>
+        </div>
+        <!-- 사업주 귀책 조기퇴근: 조퇴 체크 시에만 표시 -->
+        <div id="employerEarlyWrap" class="mt-2 ps-2 border-start border-warning"
+             style="display:<?= ($log['is_early_leave'] ?? 0) ? 'block' : 'none' ?>">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="is_employer_early_leave"
+                   name="is_employer_early_leave" value="1"
+                   <?= ($log['is_employer_early_leave'] ?? 0) ? 'checked' : '' ?>>
+            <label class="form-check-label small" for="is_employer_early_leave">
+              사업주 지시 조기퇴근
+              <i class="bi bi-question-circle text-muted" data-bs-toggle="tooltip"
+                 title="손님 없음 등 매장 사정으로 사업주가 조기 퇴근을 지시한 경우. 5인 이상 사업장에서는 못 일한 시간의 70%를 휴업수당으로 지급해야 합니다."></i>
+            </label>
           </div>
         </div>
       </div>
@@ -155,6 +170,11 @@
 </div>
 
 <script>
+function toggleEmployerEarly() {
+    var isEarly = document.getElementById('is_early_leave').checked;
+    document.getElementById('employerEarlyWrap').style.display = isEarly ? 'block' : 'none';
+    if (!isEarly) document.getElementById('is_employer_early_leave').checked = false;
+}
 function toggleAbsent(isAbsent) {
     document.getElementById('timeSection').style.display = isAbsent ? 'none' : 'block';
 }

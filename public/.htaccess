@@ -1,5 +1,16 @@
 Options -Indexes
 RewriteEngine On
+
+# ─── 깔끔한 URL 라우트 ────────────────────────────────────
+RewriteRule ^login/?$            index.php?c=auth&a=login        [L,QSA]
+RewriteRule ^signup/?$           index.php?c=signup              [L,QSA]
+RewriteRule ^signup/owner/?$     index.php?c=signup&a=owner      [L,QSA]
+RewriteRule ^signup/employee/?$  index.php?c=signup&a=employee   [L,QSA]
+RewriteRule ^invite/([a-zA-Z0-9_-]+)/?$ index.php?c=invite&token=$1 [L,QSA]
+RewriteRule ^privacy/?$          index.php?c=privacy             [L,QSA]
+RewriteRule ^terms/?$            index.php?c=terms               [L,QSA]
+
+# ─── 기본 라우트 (파일/디렉토리가 아니면 프론트 컨트롤러로) ──
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [QSA,L]

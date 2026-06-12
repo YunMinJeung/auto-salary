@@ -61,7 +61,7 @@
       </thead>
       <tbody>
         <?php foreach ($employees as $emp):
-          $isRetired = !empty($emp['employment_end_date']);
+          $isRetired = !empty($emp['employment_end_date']) && $emp['employment_end_date'] < date('Y-m-d');
           // 소수점 없는 시간 표기: 32.0→32, 37.5→37.5
           $hrs = (float)$emp['weekly_scheduled_hours'];
           $hrsStr = ($hrs == floor($hrs)) ? (int)$hrs : $hrs;
@@ -104,6 +104,14 @@
           <!-- 액션 버튼 -->
           <td class="text-end pe-3">
             <div class="d-flex gap-1 justify-content-end">
+              <?php if (!empty($emp['store_member_id'])): ?>
+              <a href="<?= url('members', 'contract', ['id' => $emp['store_member_id']]) ?>"
+                 target="_blank"
+                 class="btn btn-sm btn-outline-secondary"
+                 data-bs-toggle="tooltip" data-bs-placement="top" title="근로계약서">
+                <i class="bi bi-file-earmark-text"></i>
+              </a>
+              <?php endif; ?>
               <a href="<?= url('work_logs', 'index', ['employee_id' => $emp['id']]) ?>"
                  class="btn btn-sm btn-outline-secondary"
                  data-bs-toggle="tooltip" data-bs-placement="top" title="근무 기록">

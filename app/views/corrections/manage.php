@@ -53,15 +53,23 @@
           <td>
             <?php
             $statusMap = [
-              'pending'  => ['bg-warning text-dark', '대기'],
-              'approved' => ['bg-success', '승인'],
-              'rejected' => ['bg-danger', '반려'],
+              'pending'        => ['bg-warning text-dark', '대기'],
+              'approved'       => ['bg-success',           '승인'],
+              'rejected'       => ['bg-danger',            '반려'],
+              'objected'       => ['bg-warning text-dark', '이의제기'],
+              'final_rejected' => ['bg-danger',            '최종반려'],
             ];
             [$bc, $bl] = $statusMap[$req['status']] ?? ['bg-secondary', $req['status']];
             ?>
             <span class="badge <?= $bc ?>"><?= $bl ?></span>
             <?php if ($req['owner_comment']): ?>
             <div class="text-muted" style="font-size:.7rem"><?= h($req['owner_comment']) ?></div>
+            <?php endif; ?>
+            <?php if (!empty($req['employee_objection'])): ?>
+            <div class="mt-1 p-2 rounded" style="background:#fff3cd;font-size:.75rem">
+              <i class="bi bi-flag-fill text-warning me-1"></i>
+              <strong>이의제기:</strong> <?= h($req['employee_objection']) ?>
+            </div>
             <?php endif; ?>
           </td>
           <td>
@@ -73,6 +81,15 @@
               <button class="btn btn-xs btn-outline-danger"
                       onclick="handleRequest(<?= $req['id'] ?>, 'reject')"
                       style="font-size:.75rem;padding:.2rem .5rem">반려</button>
+            </div>
+            <?php elseif ($req['status'] === 'objected'): ?>
+            <div class="d-flex gap-1">
+              <button class="btn btn-xs btn-outline-success"
+                      onclick="handleRequest(<?= $req['id'] ?>, 'reapprove')"
+                      style="font-size:.75rem;padding:.2rem .5rem">재승인</button>
+              <button class="btn btn-xs btn-outline-danger"
+                      onclick="handleRequest(<?= $req['id'] ?>, 'final_reject')"
+                      style="font-size:.75rem;padding:.2rem .5rem">최종반려</button>
             </div>
             <?php else: ?>
             <span class="text-muted small">완료</span>
@@ -97,12 +114,18 @@
 <script>
 function handleRequest(id, action) {
   var comment = '';
-  if (action === 'reject') {
-    comment = prompt('반려 사유를 입력하세요 (선택사항)');
-    if (comment === null) return; // 취소
+  if (action === 'reject' || action === 'final_reject') {
+    comment = prompt(action === 'final_reject' ? '최종 반려 사유를 입력하세요 (선택사항)' : '반려 사유를 입력하세요 (선택사항)');
+    if (comment === null) return;
   }
+  var actionMap = {
+    approve:      'approve_correction',
+    reject:       'reject_correction',
+    reapprove:    'reapprove_correction',
+    final_reject: 'final_reject_correction',
+  };
   var form = document.getElementById('action-form');
-  form.action = '<?= BASE_URL ?>index.php?c=attendance&a=' + (action === 'approve' ? 'approve_correction' : 'reject_correction');
+  form.action = '<?= BASE_URL ?>index.php?c=attendance&a=' + actionMap[action];
   document.getElementById('action-id').value      = id;
   document.getElementById('action-comment').value = comment || '';
   form.submit();

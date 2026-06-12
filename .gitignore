@@ -10,3 +10,11 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+# Claude Code 내부 파일
+.claude/
+CLAUDE.md
+_workspace/
+1.png
+2.png
+query

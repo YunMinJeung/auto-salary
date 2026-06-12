@@ -100,7 +100,7 @@ class AuthController
     public function logout(): void
     {
         Auth::logout();
-        redirect(url('auth', 'login'));
+        redirect(url('home'));
     }
 
     // ── private helpers ──────────────────────────────────────
@@ -108,21 +108,36 @@ class AuthController
     private function setupStoreSession(array $user): void
     {
         if (Auth::isOwner()) {
-            $store = Store::findByOwner($user['id']);
-            if ($store) {
-                Auth::setStoreSession($store['id']);
+            $stores = Store::allByOwner($user['id']);
+            if ($stores) {
+                Auth::setStoreSession((int)$stores[0]['id']);
             }
         } elseif (Auth::isEmployee()) {
-            $member = StoreMember::findByUserId($user['id']);
-            if ($member) {
-                Auth::setStoreSession($member['store_id'], $member['id']);
+            $members = StoreMember::allByUserId($user['id']);
+            if (count($members) === 1) {
+                Auth::setStoreSession((int)$members[0]['store_id'], (int)$members[0]['id']);
+            } elseif (count($members) > 1) {
+                // 다중 매장 → 세션에 후보 목록 저장, 선택 화면으로
+                $_SESSION['pending_store_members'] = $members;
             }
         }
     }
 
     private function redirectByRole(): void
     {
-        if (Auth::isEmployee()) {
+        // QR 스캔 후 로그인 시 원래 페이지로 복귀
+        if (!empty($_SESSION['redirect_after_login'])) {
+            $target = $_SESSION['redirect_after_login'];
+            unset($_SESSION['redirect_after_login']);
+            redirect($target);
+        }
+
+        if (Auth::isSuperAdmin()) {
+            redirect(url('admin'));
+        } elseif (Auth::isEmployee()) {
+            if (!empty($_SESSION['pending_store_members'])) {
+                redirect(url('employee', 'select_store'));
+            }
             redirect(url('employee'));
         } else {
             redirect(url());

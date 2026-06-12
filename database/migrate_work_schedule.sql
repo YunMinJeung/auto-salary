@@ -1,0 +1,4 @@
+ALTER TABLE store_members
+  ADD COLUMN IF NOT EXISTS work_start_time     TIME         NULL DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS work_end_time       TIME         NULL DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS daily_break_minutes INT UNSIGNED NULL DEFAULT NULL;

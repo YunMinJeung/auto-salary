@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1180">
+<title>페이클락 대시보드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;}
+:root{
+  --pc-primary:#0F766E;--pc-primary-dark:#115E59;--pc-primary-light:#CCFBF1;
+  --pc-primary-soft:#DDF7F2;--pc-primary-bg:#F0FDFA;
+  --pc-success:#059669;--pc-success-light:#DCFCE7;
+  --pc-danger:#DC2626;--pc-danger-light:#FEE2E2;
+  --pc-warning:#D97706;--pc-warning-light:#FEF3C7;
+  --pc-info:#2563EB;--pc-info-light:#DBEAFE;
+  --pc-text:#0F172A;--pc-text-sub:#334155;--pc-muted:#64748B;
+  --pc-border:#E8ECF0;--pc-border-strong:#C5CDD8;
+  --pc-bg:#F7F8FA;--pc-surface:#FFFFFF;--pc-surface-alt:#F1F5F9;
+  --radius-xl:20px;
+  --shadow-sm:0 2px 12px rgba(15,23,42,.07);
+  --shadow-brand:0 4px 12px rgba(15,118,110,.3);
+  --font-sans:'Noto Sans KR','Inter',sans-serif;
+  --font-num:'Inter',sans-serif;
+  --nav-h:52px;
+}
+body{margin:0;background:var(--pc-bg);color:var(--pc-text);font-family:var(--font-sans);font-size:.9375rem;line-height:1.6;-webkit-font-smoothing:antialiased;}
+a{text-decoration:none;color:inherit;}
+
+/* ── Mini Navbar ── */
+.nav-app{height:var(--nav-h);background:#fff;border-bottom:1px solid var(--pc-border);display:flex;align-items:center;position:sticky;top:0;z-index:40;}
+.nav-in{max-width:1180px;margin:0 auto;width:100%;padding:0 20px;display:flex;align-items:center;gap:1.5rem;}
+.brand{display:flex;align-items:center;gap:.5rem;font-weight:800;font-size:1.1rem;letter-spacing:-.5px;color:var(--pc-text);}
+.brand-mark{width:28px;height:28px;background:var(--pc-primary);color:#fff;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:.85rem;}
+.nav-links{display:flex;align-items:center;gap:.25rem;margin-left:.5rem;}
+.nav-links a{color:var(--pc-muted);font-weight:500;font-size:.8125rem;padding:.4rem .65rem;border-radius:8px;}
+.nav-links a.active{color:var(--pc-primary);background:var(--pc-primary-bg);font-weight:600;}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:.6rem;}
+.store-btn{background:var(--pc-bg);border:1.5px solid var(--pc-border);color:var(--pc-text);font-size:.775rem;font-weight:600;padding:.28rem .75rem;border-radius:9999px;display:inline-flex;align-items:center;gap:.3rem;}
+.nav-user{font-size:.775rem;color:var(--pc-muted);}
+.nav-logout{background:transparent;border:1.5px solid var(--pc-border);color:var(--pc-muted);font-size:.775rem;padding:.25rem .65rem;border-radius:9999px;}
+
+main{max-width:1180px;margin:0 auto;padding:1.5rem 20px 2rem;}
+
+/* ── Store hero ── */
+.store-hero{position:relative;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.25rem;padding:1.5rem 1.75rem;background:linear-gradient(135deg,#0F766E 0%,#0D9488 50%,#0B8A80 100%);border-radius:var(--radius-xl);box-shadow:0 8px 24px rgba(15,118,110,.25);color:#fff;overflow:hidden;}
+.store-hero::before{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,255,255,.12) 0%,transparent 65%);}
+.store-hero::after{content:'';position:absolute;left:30%;bottom:-50px;width:140px;height:140px;background:radial-gradient(circle,rgba(255,255,255,.06) 0%,transparent 65%);}
+.store-hero h1{font-size:1.35rem;font-weight:800;margin:0 0 .45rem;letter-spacing:-.3px;position:relative;}
+.hero-badges{display:flex;gap:.4rem;flex-wrap:wrap;position:relative;}
+.hbadge{display:inline-flex;align-items:center;gap:.3rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.92);padding:.18rem .65rem;border-radius:9999px;font-size:.73rem;font-weight:500;backdrop-filter:blur(4px);}
+.hero-actions{display:flex;gap:.45rem;flex-wrap:wrap;position:relative;}
+.btn{border-radius:9999px;font-weight:600;font-size:.8125rem;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:.3rem;font-family:var(--font-sans);}
+.btn-sm{font-size:.775rem;padding:.3rem .85rem;}
+.btn-xs{font-size:.7rem;padding:.15rem .55rem;}
+.btn-primary{background:var(--pc-primary);color:#fff;}
+.btn-outline-primary{background:#fff;color:var(--pc-primary);border:1.5px solid var(--pc-primary);}
+.btn-outline-secondary{background:#fff;color:var(--pc-muted);border:1.5px solid var(--pc-border);}
+.btn-outline-danger{background:#fff;color:var(--pc-danger);border:1.5px solid var(--pc-danger);}
+.hero-actions .btn-secondary{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;backdrop-filter:blur(4px);}
+.hero-actions .btn-white{background:#fff;color:var(--pc-primary);}
+
+/* ── Summary grid ── */
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.875rem;margin-bottom:1.25rem;}
+.summary-card{background:#fff;border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);padding:1.25rem 1.25rem 1.1rem;display:flex;flex-direction:column;}
+.summary-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;margin-bottom:.85rem;}
+.icon-people{background:#DCFCE7;color:#16A34A;}
+.icon-clock{background:#DBEAFE;color:#2563EB;}
+.icon-alert{background:#FEF3C7;color:#D97706;}
+.icon-payroll{background:var(--pc-primary-light);color:var(--pc-primary);}
+.summary-value{font-family:var(--font-num);font-size:1.85rem;font-weight:800;line-height:1;margin-bottom:.25rem;letter-spacing:-1px;color:var(--pc-text);}
+.summary-value.success{color:var(--pc-success);}
+.summary-value.danger{color:var(--pc-danger);}
+.summary-unit{font-family:var(--font-sans);font-size:.9rem;font-weight:600;color:var(--pc-muted);margin-left:1px;letter-spacing:0;}
+.summary-label{font-size:.8125rem;font-weight:600;color:var(--pc-text-sub);margin-bottom:.1rem;}
+.summary-caption{font-size:.7rem;color:var(--pc-muted);}
+
+/* ── Cards ── */
+.grid-2{display:grid;grid-template-columns:3fr 2fr;gap:.875rem;margin-bottom:.875rem;}
+.grid-2.even{grid-template-columns:1fr 1fr;}
+.card{background:#fff;border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);overflow:hidden;}
+.card-header{padding:1rem 1.25rem;border-bottom:1px solid rgba(0,0,0,.06);font-weight:600;font-size:.875rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem;}
+.card-header .lead-i{color:var(--pc-primary);margin-right:.35rem;}
+.card-body{padding:0;}
+.row-item{display:flex;align-items:center;gap:.75rem;padding:.75rem 1.25rem;border-bottom:1px solid rgba(0,0,0,.05);}
+.row-item:last-child{border-bottom:none;}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--pc-primary-light);color:var(--pc-primary-dark);font-size:.8rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.row-name{font-weight:600;font-size:.85rem;}
+.row-sub{font-size:.73rem;color:var(--pc-muted);margin-top:1px;}
+.row-right{margin-left:auto;display:flex;align-items:center;gap:.4rem;}
+.status-badge{display:inline-flex;align-items:center;padding:.18rem .55rem;border-radius:9999px;font-size:.68rem;font-weight:600;white-space:nowrap;}
+.badge-working{background:#DCFCE7;color:#166534;}
+.badge-done{background:#F1F5F9;color:var(--pc-muted);}
+.badge-missing{background:#FEE2E2;color:#991B1B;}
+.badge-check{background:#FEF3C7;color:#92400E;}
+.badge-linked{background:#CCFBF1;color:#134E4A;}
+.badge-invited{background:#FEF9C3;color:#713F12;}
+.badge-noaccount{background:#F1F5F9;color:var(--pc-muted);}
+.check-item{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.875rem 1.25rem;border-bottom:1px solid rgba(0,0,0,.05);}
+.check-item:last-child{border-bottom:none;}
+.check-text{font-size:.8125rem;color:var(--pc-text-sub);}
+.text-danger{color:var(--pc-danger);}
+.text-warning{color:var(--pc-warning);}
+.wdot{width:7px;height:7px;border-radius:50%;background:var(--pc-primary);flex-shrink:0;}
+.wdot.absent{background:var(--pc-border-strong);}
+.wtime{font-size:.775rem;color:var(--pc-text-sub);margin-top:1px;display:flex;align-items:center;gap:.3rem;}
+.wdur{display:inline-flex;align-items:center;background:var(--pc-bg);border:1px solid var(--pc-border);color:var(--pc-text-sub);font-size:.65rem;font-weight:600;padding:.08rem .4rem;border-radius:9999px;}
+.wdate{font-size:.73rem;color:var(--pc-muted);margin-left:5px;}
+.grid-charts{display:grid;grid-template-columns:1fr 1fr;gap:.875rem;margin-top:.875rem;}
+.flex-1{flex:1;min-width:0;}
+</style>
+</head>
+<body>
+
+<!-- Mini Nav -->
+<nav class="nav-app">
+  <div class="nav-in">
+    <a href="#" class="brand">
+      <span class="brand-mark"><i class="bi bi-calculator-fill"></i></span>페이클락
+    </a>
+    <div class="nav-links">
+      <a href="#" class="active"><i class="bi bi-grid-1x2"></i> 대시보드</a>
+      <a href="#"><i class="bi bi-people"></i> 직원</a>
+      <a href="#"><i class="bi bi-clock-history"></i> 출퇴근</a>
+      <a href="#"><i class="bi bi-cash-coin"></i> 급여</a>
+      <a href="#"><i class="bi bi-shield-check"></i> 리스크</a>
+    </div>
+    <div class="nav-right">
+      <button class="store-btn"><i class="bi bi-shop"></i> 홍길동 편의점 <i class="bi bi-chevron-down"></i></button>
+      <span class="nav-user">홍길동 사장님</span>
+      <button class="nav-logout"><i class="bi bi-box-arrow-right"></i> 로그아웃</button>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+<!-- Store Hero -->
+<section class="store-hero">
+  <div>
+    <h1>홍길동 편의점 대시보드</h1>
+    <div class="hero-badges">
+      <span class="hbadge"><i class="bi bi-calendar3"></i> 2026년 6월 12일 (금)</span>
+      <span class="hbadge"><i class="bi bi-building"></i> 5인 미만 사업장</span>
+      <span class="hbadge"><i class="bi bi-currency-won"></i> 최저시급 10,320원</span>
+    </div>
+  </div>
+  <div class="hero-actions">
+    <a href="#" class="btn btn-sm btn-secondary"><i class="bi bi-qr-code"></i> QR 출퇴근</a>
+    <a href="#" class="btn btn-sm btn-white"><i class="bi bi-plus"></i> 근무 기록 추가</a>
+  </div>
+</section>
+
+<!-- 4 Stat Cards -->
+<div class="summary-grid">
+  <a href="#" class="summary-card">
+    <div class="summary-icon icon-people"><i class="bi bi-people-fill"></i></div>
+    <div class="summary-value">4<span class="summary-unit">명</span></div>
+    <div class="summary-label">재직 직원</div>
+    <div class="summary-caption">현재 등록 직원</div>
+  </a>
+  <a href="#" class="summary-card">
+    <div class="summary-icon icon-clock"><i class="bi bi-door-open-fill"></i></div>
+    <div class="summary-value success">2<span class="summary-unit">명</span></div>
+    <div class="summary-label">오늘 근무</div>
+    <div class="summary-caption">현재 출근 중</div>
+  </a>
+  <a href="#" class="summary-card">
+    <div class="summary-icon icon-alert"><i class="bi bi-bell-fill"></i></div>
+    <div class="summary-value danger">3<span class="summary-unit">건</span></div>
+    <div class="summary-label">확인 필요</div>
+    <div class="summary-caption">리스크 · 수정요청 · 이의</div>
+  </a>
+  <a href="#" class="summary-card">
+    <div class="summary-icon icon-payroll"><i class="bi bi-cash-coin"></i></div>
+    <div class="summary-value" style="font-size:1.1rem;letter-spacing:0;color:var(--pc-primary);font-weight:800;">바로가기 →</div>
+    <div class="summary-label">급여 계산</div>
+    <div class="summary-caption">주간 · 월간 급여</div>
+  </a>
+</div>
+
+<!-- Main 2-col -->
+<div class="grid-2">
+  <div class="card">
+    <div class="card-header">
+      <span><i class="bi bi-clock-fill lead-i"></i>오늘 출퇴근 현황</span>
+      <a href="#" class="btn btn-sm btn-outline-primary">전체 보기</a>
+    </div>
+    <div class="card-body">
+      <div class="row-item">
+        <div class="avatar">김</div>
+        <div class="flex-1"><div class="row-name">김철수</div><div class="row-sub">09:01 ~ 근무 중</div></div>
+        <div class="row-right"><span class="status-badge badge-working">근무 중</span></div>
+      </div>
+      <div class="row-item">
+        <div class="avatar">이</div>
+        <div class="flex-1"><div class="row-name">이영희</div><div class="row-sub">10:30 ~ 근무 중</div></div>
+        <div class="row-right"><span class="status-badge badge-working">근무 중</span></div>
+      </div>
+      <div class="row-item">
+        <div class="avatar">박</div>
+        <div class="flex-1"><div class="row-name">박민준</div><div class="row-sub">13:00 출근 예정</div></div>
+        <div class="row-right"><span class="status-badge badge-check">대기</span></div>
+      </div>
+      <div class="row-item">
+        <div class="avatar">최</div>
+        <div class="flex-1"><div class="row-name">최지우</div><div class="row-sub">비번일</div></div>
+        <div class="row-right"><span class="status-badge badge-done">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><i class="bi bi-bell-fill lead-i"></i>확인 필요한 항목</div>
+    <div class="card-body">
+      <div class="check-item">
+        <span class="check-text"><strong class="text-danger">2건</strong> 노무 리스크</span>
+        <a href="#" class="btn btn-sm btn-outline-danger">확인</a>
+      </div>
+      <div class="check-item">
+        <span class="check-text"><strong class="text-warning">1건</strong> 근무 수정 요청</span>
+        <a href="#" class="btn btn-sm btn-outline-primary">확인</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom 2-col -->
+<div class="grid-2 even">
+  <div class="card">
+    <div class="card-header">
+      <span><i class="bi bi-people-fill lead-i"></i>재직 중 직원</span>
+      <a href="#" class="btn btn-sm btn-primary"><i class="bi bi-plus"></i> 직원 추가</a>
+    </div>
+    <div class="card-body">
+      <div class="row-item">
+        <div class="avatar">김</div>
+        <div class="flex-1"><div class="row-name">김철수</div><div class="row-sub">시급 12,000원</div></div>
+        <div class="row-right"><span class="status-badge badge-linked">연결 완료</span><a href="#" class="btn btn-xs btn-outline-secondary">상세</a></div>
+      </div>
+      <div class="row-item">
+        <div class="avatar">이</div>
+        <div class="flex-1"><div class="row-name">이영희</div><div class="row-sub">시급 11,500원</div></div>
+        <div class="row-right"><span class="status-badge badge-linked">연결 완료</span><a href="#" class="btn btn-xs btn-outline-secondary">상세</a></div>
+      </div>
+      <div class="row-item">
+        <div class="avatar">박</div>
+        <div class="flex-1"><div class="row-name">박민준</div><div class="row-sub">시급 10,500원</div></div>
+        <div class="row-right"><span class="status-badge badge-invited">초대 대기</span><a href="#" class="btn btn-xs btn-outline-secondary">상세</a></div>
+      </div>
+      <div class="row-item">
+        <div class="avatar">최</div>
+        <div class="flex-1"><div class="row-name">최지우</div><div class="row-sub">시급 10,320원</div></div>
+        <div class="row-right"><span class="status-badge badge-noaccount">계정 없음</span><a href="#" class="btn btn-xs btn-outline-secondary">상세</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span><i class="bi bi-clock-history lead-i"></i>최근 근무 기록</span>
+      <a href="#" class="btn btn-sm btn-outline-primary">전체 보기</a>
+    </div>
+    <div class="card-body">
+      <div class="row-item">
+        <div class="wdot"></div>
+        <div class="flex-1">
+          <div><span class="row-name">김철수</span><span class="wdate">06/12(금)</span></div>
+          <div class="wtime">09:01 ~ 18:00 <span class="wdur">8시간 29분</span></div>
+        </div>
+      </div>
+      <div class="row-item">
+        <div class="wdot"></div>
+        <div class="flex-1">
+          <div><span class="row-name">이영희</span><span class="wdate">06/12(금)</span></div>
+          <div class="wtime">10:30 ~ 16:00 <span class="wdur">5시간 30분</span></div>
+        </div>
+      </div>
+      <div class="row-item">
+        <div class="wdot"></div>
+        <div class="flex-1">
+          <div><span class="row-name">박민준</span><span class="wdate">06/11(목)</span></div>
+          <div class="wtime">13:00 ~ 19:30 <span class="wdur">6시간 30분</span></div>
+        </div>
+      </div>
+      <div class="row-item">
+        <div class="wdot absent"></div>
+        <div class="flex-1">
+          <div><span class="row-name">최지우</span><span class="wdate">06/11(목)</span></div>
+          <div class="wtime"><span class="status-badge badge-missing">결근</span></div>
+        </div>
+      </div>
+      <div class="row-item">
+        <div class="wdot"></div>
+        <div class="flex-1">
+          <div><span class="row-name">이영희</span><span class="wdate">06/10(수)</span></div>
+          <div class="wtime">09:00 ~ 14:00 <span class="wdur">5시간</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="grid-charts">
+  <div class="card">
+    <div class="card-header"><i class="bi bi-bar-chart-fill lead-i"></i>월별 인건비 추이</div>
+    <div style="padding:1rem 1.25rem"><canvas id="chartMonthly" height="160"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><i class="bi bi-person-clock lead-i"></i>이번 주 직원별 근무시간</div>
+    <div style="padding:1rem 1.25rem"><canvas id="chartWeekly" height="160"></canvas></div>
+  </div>
+</div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const teal='#0F766E',tealT='rgba(15,118,110,.5)',pink='#F194B4',pinkT='rgba(241,148,180,.5)';
+const ff="'Noto Sans KR',sans-serif";
+const base={responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{family:ff,size:10},color:'#64748B'},grid:{color:'rgba(0,0,0,.04)'}},y:{ticks:{font:{family:ff,size:10},color:'#64748B'},grid:{color:'rgba(0,0,0,.04)'}}}};
+new Chart(document.getElementById('chartMonthly'),{type:'bar',data:{labels:['1월','2월','3월','4월','5월','6월'],datasets:[{data:[1840000,2020000,1950000,2180000,2350000,2140000],backgroundColor:tealT,borderColor:teal,borderWidth:1.5,borderRadius:5}]},options:{...base,scales:{...base.scales,y:{...base.scales.y,ticks:{...base.scales.y.ticks,callback:v=>(v/10000)+'만'}}}}});
+new Chart(document.getElementById('chartWeekly'),{type:'bar',data:{labels:['김철수','이영희','박민준','최지우'],datasets:[{data:[34.5,22.0,19.5,8.5],backgroundColor:pinkT,borderColor:pink,borderWidth:1.5,borderRadius:5}]},options:{...base,indexAxis:'y',scales:{...base.scales,x:{...base.scales.x,ticks:{...base.scales.x.ticks,callback:v=>v+'h'}}}}});
+</script>
+</body>
+</html>

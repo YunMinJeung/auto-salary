@@ -24,7 +24,7 @@
       <div class="card-body">
 
         <div class="mb-3">
-          <label class="form-label fw-semibold">이름 <span class="text-danger">*</span></label>
+          <label class="form-label fw-semibold">직원명 <span class="text-danger">*</span></label>
           <input type="text" name="name"
                  class="form-control <?= isset($errors['name']) ? 'is-invalid' : '' ?>"
                  value="<?= h($employee['name'] ?? '') ?>" required>
@@ -52,6 +52,11 @@
           <?php $curMinWage = MinimumWage::currentHourlyWage(); ?>
           <div class="form-text">
             <?= date('Y') ?>년 법정 최저시급: <?= number_format($curMinWage) ?>원
+          </div>
+          <div class="form-text text-warning-emphasis small">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            <strong>수습 감액(최저시급 90%)은 ① 계약기간 1년 이상 + ② 수습 3개월 이내일 때만 적용 가능합니다.</strong>
+            편의점·카페 스태프 등 단순노무직은 계약기간과 무관하게 감액 불가(최저시급 100% 지급).
           </div>
         </div>
 
@@ -110,7 +115,7 @@
             <?php endif; ?>
           </div>
           <div class="col-6">
-            <label class="form-label fw-semibold">퇴사일 <span class="text-muted small fw-normal">(선택)</span></label>
+            <label class="form-label fw-semibold">계약 종료일 <span class="text-muted small fw-normal">(선택)</span></label>
             <input type="date" name="employment_end_date" class="form-control"
                    value="<?= h($employee['employment_end_date'] ?? '') ?>">
           </div>
@@ -119,6 +124,9 @@
         <div class="mb-3">
           <label class="form-label fw-semibold">메모</label>
           <textarea name="memo" class="form-control" rows="2"><?= h($employee['memo'] ?? '') ?></textarea>
+          <div class="form-text text-danger-emphasis">
+            <i class="bi bi-shield-exclamation me-1"></i>주민등록번호, 계좌번호, 건강정보 등 민감한 개인정보는 입력하지 마세요.
+          </div>
         </div>
 
       </div>
@@ -182,11 +190,23 @@
 
 </div><!-- /row -->
 
-<div class="d-flex gap-2 mt-4">
-  <button type="submit" class="btn btn-primary px-4">
+<div class="d-flex flex-wrap gap-2 mt-4 align-items-center">
+  <button type="submit" name="create_contract" value="" class="btn btn-primary px-4">
     <i class="bi bi-save me-1"></i>저장
   </button>
+  <?php if (!$isEdit): ?>
+  <button type="submit" name="create_contract" value="1"
+          class="btn px-4 text-white" style="background:var(--c-teal)">
+    <i class="bi bi-file-earmark-text me-1"></i>저장 후 계약서 작성
+  </button>
+  <?php endif; ?>
   <a href="<?= url('employees') ?>" class="btn btn-outline-secondary">취소</a>
+  <?php if ($isEdit && !empty($memberId)): ?>
+  <a href="<?= url('members', 'contract', ['id' => $memberId]) ?>"
+     target="_blank" class="btn btn-outline-dark ms-auto">
+    <i class="bi bi-file-earmark-text me-1"></i>근로계약서 생성
+  </a>
+  <?php endif; ?>
 </div>
 
 </form>

@@ -7,6 +7,10 @@
 </div>
 
 <!-- 직원 필터 -->
+<?php
+  $dateFrom = $_GET['date_from'] ?? date('Y-m-01');
+  $dateTo   = $_GET['date_to']   ?? date('Y-m-d');
+?>
 <div class="card border-0 shadow-sm mb-4">
   <div class="card-body py-2">
     <form method="get" action="<?= url('work_logs') ?>" class="d-flex align-items-center gap-2 flex-wrap">
@@ -20,12 +24,23 @@
         </option>
         <?php endforeach; ?>
       </select>
+      <label class="text-muted small mb-0">기간:</label>
+      <input type="date" name="date_from" class="form-control form-control-sm w-auto" value="<?= h($dateFrom) ?>">
+      <span class="text-muted">~</span>
+      <input type="date" name="date_to" class="form-control form-control-sm w-auto" value="<?= h($dateTo) ?>">
+      <button type="submit" class="btn btn-sm btn-primary">
+        <i class="bi bi-search me-1"></i>조회
+      </button>
       <?php if ($employeeId): ?>
         <a href="<?= url('payroll', 'index', ['employee_id' => $employeeId, 'week_date' => date('Y-m-d')]) ?>"
            class="btn btn-sm btn-outline-primary">
           <i class="bi bi-calculator me-1"></i>급여 계산
         </a>
       <?php endif; ?>
+      <a href="<?= url('work_logs', 'export', ['employee_id' => $employeeId, 'date_from' => $dateFrom, 'date_to' => $dateTo]) ?>"
+         class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-download me-1"></i>CSV 내보내기
+      </a>
     </form>
   </div>
 </div>

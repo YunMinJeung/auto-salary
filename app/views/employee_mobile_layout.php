@@ -49,10 +49,25 @@
     <div class="store-name"><?= h($member['store_name'] ?? '사업장') ?></div>
     <div class="emp-name"><?= h(Auth::user()['name'] ?? '') ?></div>
   </div>
-  <a href="<?= url('auth', 'logout') ?>" class="btn btn-sm btn-outline-light py-1 px-2">
-    <i class="bi bi-box-arrow-right"></i>
-  </a>
+  <div class="d-flex gap-2 align-items-center">
+    <a href="<?= url('employee', 'income') ?>"
+       class="btn btn-sm btn-outline-light py-1 px-2"
+       title="내 수입">
+      <i class="bi bi-wallet2"></i>
+    </a>
+    <a href="<?= url('auth', 'logout') ?>" class="btn btn-sm btn-outline-light py-1 px-2">
+      <i class="bi bi-box-arrow-right"></i>
+    </a>
+  </div>
 </header>
+
+<?php if (!empty($member['store_notice'])): ?>
+<div class="py-2 px-3 small d-flex align-items-start gap-2"
+     style="background:var(--c-amber);color:var(--c-dark);border-bottom:1px solid rgba(0,0,0,.1)">
+  <i class="bi bi-megaphone-fill flex-shrink-0 mt-1"></i>
+  <span><?= h($member['store_notice']) ?></span>
+</div>
+<?php endif; ?>
 
 <main>
 

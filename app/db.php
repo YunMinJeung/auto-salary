@@ -41,4 +41,38 @@ class DB
     {
         return (int) self::connect()->lastInsertId();
     }
+
+    public static function beginTransaction(): void
+    {
+        self::connect()->beginTransaction();
+    }
+
+    public static function commit(): void
+    {
+        self::connect()->commit();
+    }
+
+    public static function rollback(): void
+    {
+        if (self::connect()->inTransaction()) {
+            self::connect()->rollBack();
+        }
+    }
+
+    /**
+     * 콜백을 트랜잭션으로 감싼다.
+     * beginTransaction → $callback() → commit. 예외 발생 시 rollback 후 re-throw.
+     */
+    public static function transaction(callable $callback): mixed
+    {
+        self::beginTransaction();
+        try {
+            $result = $callback();
+            self::commit();
+            return $result;
+        } catch (Throwable $e) {
+            self::rollback();
+            throw $e;
+        }
+    }
 }

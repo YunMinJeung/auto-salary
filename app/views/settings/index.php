@@ -97,6 +97,182 @@
           </div>
         </div>
 
+        <hr>
+        <h6 class="text-muted mb-3 text-uppercase small fw-bold">4대보험 공제 설정</h6>
+        <div class="alert alert-info small py-2 mb-3">
+          <i class="bi bi-info-circle me-1"></i>
+          <strong>2026년 근로자 부담 요율</strong>: 국민연금 4.75% · 건강보험 3.595% · 장기요양(건강보험료의 13.14%) · 고용보험 0.9%<br>
+          월 60시간 미만 또는 주 15시간 미만 단기 알바는 국민연금·건강보험이 면제될 수 있습니다.
+          공제를 적용할 보험 항목만 체크하세요. 급여명세서에 반영됩니다.
+        </div>
+        <?php
+        $ins = [
+          ['apply_national_pension',     '국민연금',    '근로자 4.75% (2026년 개편 적용)'],
+          ['apply_health_insurance',     '건강보험',    '근로자 3.595% + 장기요양보험(건강보험료의 13.14%)'],
+          ['apply_employment_insurance', '고용보험',    '근로자 0.9% (실업급여)'],
+        ];
+        foreach ($ins as [$key, $label, $hint]):
+        ?>
+        <div class="mb-2">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="<?= $key ?>"
+                   name="<?= $key ?>" value="1"
+                   <?= ($settings[$key] ?? 1) ? 'checked' : '' ?>>
+            <label class="form-check-label" for="<?= $key ?>">
+              <?= $label ?> <span class="text-muted small">(<?= $hint ?>)</span>
+            </label>
+          </div>
+        </div>
+        <?php endforeach; ?>
+        <div class="mb-3 small text-muted">
+          <i class="bi bi-shield-check me-1"></i>산재보험은 사용자 전액 부담으로 근로자 공제 없음.
+        </div>
+
+        <hr>
+        <h6 class="text-muted mb-3 text-uppercase small fw-bold">사업장 추가 정보</h6>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">업종 <small class="text-muted fw-normal">(선택)</small></label>
+          <input type="text" name="business_category" class="form-control"
+                 value="<?= h($store['business_category'] ?? '') ?>" placeholder="예) 음식점업, 소매업">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">사업장 전화번호 <small class="text-muted fw-normal">(선택)</small></label>
+          <input type="tel" name="business_phone" class="form-control"
+                 value="<?= h($store['business_phone'] ?? '') ?>" placeholder="02-000-0000">
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">급여 담당자 이름 <small class="text-muted fw-normal">(선택)</small></label>
+            <input type="text" name="payroll_manager_name" class="form-control"
+                   value="<?= h($store['payroll_manager_name'] ?? '') ?>">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">급여 담당자 연락처 <small class="text-muted fw-normal">(선택)</small></label>
+            <input type="tel" name="payroll_manager_phone" class="form-control"
+                   value="<?= h($store['payroll_manager_phone'] ?? '') ?>" placeholder="010-0000-0000">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">주휴수당 정책</label>
+          <?php $whp = $store['weekly_holiday_pay_policy'] ?? 'AUTO_CHECK'; ?>
+          <select name="weekly_holiday_pay_policy" class="form-select">
+            <option value="AUTO_CHECK"   <?= $whp === 'AUTO_CHECK'   ? 'selected' : '' ?>>자동 확인</option>
+            <option value="MANUAL_CHECK" <?= $whp === 'MANUAL_CHECK' ? 'selected' : '' ?>>수동 확인</option>
+          </select>
+          <div class="form-text">주휴수당 발생 여부를 시스템이 자동 판단할지, 사장님이 직접 확인할지 선택합니다.</div>
+        </div>
+
+        <hr>
+        <h6 class="text-muted mb-3 text-uppercase small fw-bold">직원 앱 설정</h6>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">매장 공지사항</label>
+          <textarea name="notice" class="form-control" rows="2" maxlength="200"
+                    placeholder="직원 앱 상단에 표시할 공지사항을 입력하세요."><?= h($store['notice'] ?? '') ?></textarea>
+          <div class="form-text">최대 200자. 비워두면 표시되지 않습니다.</div>
+        </div>
+
+        <div class="mb-2">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="show_pay_to_employee"
+                   name="show_pay_to_employee" value="1"
+                   <?= ($settings['show_pay_to_employee'] ?? 1) ? 'checked' : '' ?>>
+            <label class="form-check-label" for="show_pay_to_employee">
+              직원에게 예상 급여 표시
+              <span class="text-muted small">(꺼두면 직원 앱에서 급여 금액 숨김)</span>
+            </label>
+          </div>
+        </div>
+
+        <hr>
+        <h6 class="text-muted mb-3 text-uppercase small fw-bold">직원 급여 공개 설정</h6>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">알바에게 예상 급여 공개 수준</label>
+          <div class="small text-muted mb-2">알바의 "내 수입" 화면에 어느 수준까지 급여를 공개할지 설정합니다.</div>
+          <?php
+          $visibilityOptions = [
+              'HOURS_ONLY'              => ['label'=>'근무시간만', 'desc'=>'예상 급여 금액은 표시하지 않습니다.'],
+              'ESTIMATED_TOTAL_ONLY'    => ['label'=>'예상 총액', 'desc'=>'이번 달 예상 급여 총액만 표시합니다. (기본값)'],
+              'ESTIMATED_WITH_BREAKDOWN'=> ['label'=>'예상 총액 + 상세내역', 'desc'=>'기본급·주휴수당·가산수당·공제 예상액을 모두 표시합니다.'],
+          ];
+          $curVisibility = $store['employee_pay_visibility'] ?? 'ESTIMATED_TOTAL_ONLY';
+          foreach ($visibilityOptions as $val => $opt):
+          ?>
+          <div class="form-check mb-1">
+            <input class="form-check-input" type="radio" name="employee_pay_visibility"
+                   id="epv_<?= $val ?>" value="<?= $val ?>"
+                   <?= $curVisibility === $val ? 'checked' : '' ?>>
+            <label class="form-check-label" for="epv_<?= $val ?>">
+              <span class="fw-semibold"><?= $opt['label'] ?></span>
+              <span class="text-muted small ms-1"><?= $opt['desc'] ?></span>
+            </label>
+          </div>
+          <?php endforeach; ?>
+          <div class="form-text mt-1">
+            <i class="bi bi-lock-fill me-1"></i>확정 급여명세서는 사장이 지급 처리한 후에는 항상 알바에게 공개됩니다.
+          </div>
+        </div>
+
+        <hr>
+        <h6 class="text-muted mb-3 text-uppercase small fw-bold">급여 정산 주기</h6>
+        <div class="mb-3">
+          <label class="form-label fw-semibold small">정산 주기</label>
+          <div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="business_pay_period_type"
+                     id="period_monthly" value="MONTHLY"
+                     <?= ($store['business_pay_period_type'] ?? 'MONTHLY') === 'MONTHLY' ? 'checked' : '' ?>>
+              <label class="form-check-label" for="period_monthly">월급</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="business_pay_period_type"
+                     id="period_weekly" value="WEEKLY" disabled>
+              <label class="form-check-label text-muted" for="period_weekly">
+                주급 <span class="badge bg-secondary small">준비 중</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-text text-muted mt-1">
+            현재는 월급 정산만 지원합니다. 주급 정산은 추후 지원 예정입니다.
+          </div>
+        </div>
+
+        <hr>
+        <h6 class="text-muted mb-3 text-uppercase small fw-bold">
+          <i class="bi bi-geo-alt-fill me-1 text-teal"></i>GPS 출퇴근 인증
+        </h6>
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" type="checkbox" name="gps_required" id="gpsRequired"
+                 value="1" <?= !empty($store['gps_required']) ? 'checked' : '' ?>>
+          <label class="form-check-label" for="gpsRequired">
+            GPS 인증 사용 <span class="text-muted small">(QR 스캔 시 매장 반경 내에서만 출퇴근 허용)</span>
+          </label>
+        </div>
+        <div id="gpsFields">
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label small fw-semibold">위도 (Latitude)</label>
+              <input type="number" step="0.00000001" name="latitude" class="form-control"
+                     value="<?= h($store['latitude'] ?? '') ?>" placeholder="37.12345678">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-semibold">경도 (Longitude)</label>
+              <input type="number" step="0.00000001" name="longitude" class="form-control"
+                     value="<?= h($store['longitude'] ?? '') ?>" placeholder="127.12345678">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small fw-semibold">허용 반경 (미터)</label>
+              <input type="number" name="gps_radius" class="form-control"
+                     value="<?= h($store['gps_radius'] ?? 200) ?>" min="50" max="2000">
+            </div>
+          </div>
+          <button type="button" class="btn btn-outline-secondary btn-sm" id="detectGpsBtn">
+            <i class="bi bi-crosshair me-1"></i>현재 위치로 자동 설정
+          </button>
+          <div class="form-text mt-1">매장에서 이 버튼을 누르면 현재 위치가 자동으로 입력됩니다.</div>
+        </div>
+
         <!-- 숨겨진 필드: 기존 minimum_wage 컬럼 유지 (기존 계산 호환) -->
         <input type="hidden" name="minimum_wage_year" value="<?= h($settings['minimum_wage_year']) ?>">
         <input type="hidden" name="minimum_wage"      value="<?= h($settings['minimum_wage']) ?>">
@@ -282,4 +458,29 @@ document.getElementById('addMinWageModal').addEventListener('hidden.bs.modal', f
   document.getElementById('mw_year').value = <?= date('Y') + 1 ?>;
   calcMonthly();
 });
+
+// GPS 설정
+(function() {
+  var gpsReq = document.getElementById('gpsRequired');
+  var gpsFields = document.getElementById('gpsFields');
+  if (!gpsReq || !gpsFields) return;
+  function toggleGpsFields() {
+    gpsFields.style.display = gpsReq.checked ? '' : 'none';
+  }
+  toggleGpsFields();
+  gpsReq.addEventListener('change', toggleGpsFields);
+
+  var detectBtn = document.getElementById('detectGpsBtn');
+  if (detectBtn) {
+    detectBtn.addEventListener('click', function() {
+      if (!navigator.geolocation) { alert('이 브라우저는 GPS를 지원하지 않습니다.'); return; }
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        document.querySelector('[name=latitude]').value  = pos.coords.latitude.toFixed(8);
+        document.querySelector('[name=longitude]').value = pos.coords.longitude.toFixed(8);
+      }, function() {
+        alert('위치 권한이 거부되었습니다. 브라우저 설정에서 허용해 주세요.');
+      });
+    });
+  }
+})();
 </script>
