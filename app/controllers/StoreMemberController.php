@@ -288,9 +288,9 @@ class StoreMemberController
                             "INSERT INTO store_members
                                (store_id, user_id, name, account_status, employment_status,
                                 hourly_wage, weekly_scheduled_hours, weekly_scheduled_days,
-                                weekly_holiday_enabled, employment_start_date,
+                                weekly_holiday_enabled, daily_break_minutes, employment_start_date,
                                 is_active, joined_at, created_by_user_id, created_at, updated_at)
-                             VALUES (?,?,?,'linked','active',?,?,?,?,?,1,NOW(),?,NOW(),NOW())",
+                             VALUES (?,?,?,'linked','active',?,?,?,?,?,?,1,NOW(),?,NOW(),NOW())",
                             [
                                 $storeId,
                                 $userId,
@@ -299,6 +299,7 @@ class StoreMemberController
                                 (float)($_POST['weekly_contract_hours'] ?? 40),
                                 (int)($_POST['weekly_contract_days']    ?? 5),
                                 !empty($_POST['weekly_holiday_pay_enabled']) ? 1 : 0,
+                                max(0, (int)($_POST['daily_break_minutes'] ?? 60)),
                                 $_POST['hire_date'] ?: date('Y-m-d'),
                                 Auth::id(),
                             ]
