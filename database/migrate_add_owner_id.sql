@@ -37,8 +37,10 @@ ALTER TABLE `settings`
 UPDATE `settings` SET `owner_id` = 1 WHERE `owner_id` = 0;
 
 ALTER TABLE `settings`
-  ADD UNIQUE KEY IF NOT EXISTS `uq_owner_settings` (`owner_id`),
-  ADD CONSTRAINT IF NOT EXISTS `fk_settings_owner`
+  ADD UNIQUE KEY IF NOT EXISTS `uq_owner_settings` (`owner_id`);
+
+ALTER TABLE `settings`
+  ADD CONSTRAINT `fk_settings_owner`
     FOREIGN KEY (`owner_id`) REFERENCES `users`(`id`) ON DELETE CASCADE;
 
 -- 4. employees에 owner_id 추가
@@ -48,7 +50,7 @@ ALTER TABLE `employees`
 UPDATE `employees` SET `owner_id` = 1 WHERE `owner_id` = 0;
 
 ALTER TABLE `employees`
-  ADD CONSTRAINT IF NOT EXISTS `fk_employees_owner`
+  ADD CONSTRAINT `fk_employees_owner`
     FOREIGN KEY (`owner_id`) REFERENCES `users`(`id`) ON DELETE CASCADE;
 
 -- 5. work_logs에 owner_id 추가
@@ -58,7 +60,7 @@ ALTER TABLE `work_logs`
 UPDATE `work_logs` SET `owner_id` = 1 WHERE `owner_id` = 0;
 
 ALTER TABLE `work_logs`
-  ADD CONSTRAINT IF NOT EXISTS `fk_work_logs_owner`
+  ADD CONSTRAINT `fk_work_logs_owner`
     FOREIGN KEY (`owner_id`) REFERENCES `users`(`id`) ON DELETE CASCADE;
 
 -- 6. payroll_results에 owner_id 추가
@@ -68,7 +70,7 @@ ALTER TABLE `payroll_results`
 UPDATE `payroll_results` SET `owner_id` = 1 WHERE `owner_id` = 0;
 
 ALTER TABLE `payroll_results`
-  ADD CONSTRAINT IF NOT EXISTS `fk_payroll_owner`
+  ADD CONSTRAINT `fk_payroll_owner`
     FOREIGN KEY (`owner_id`) REFERENCES `users`(`id`) ON DELETE CASCADE;
 
 SET FOREIGN_KEY_CHECKS = 1;
