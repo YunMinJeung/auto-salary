@@ -22,9 +22,8 @@ foreach ($monthSchedules ?? [] as $s) {
 $palette = ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ef4444','#06b6d4','#f97316','#ec4899','#84cc16','#14b8a6'];
 $empIdx  = []; $ci = 0;
 foreach ($employees as $e) { $empIdx[$e['id']] = $ci++; }
-function _eColor(int $id, array $idx, array $pal): string {
-    return $pal[($idx[$id] ?? $id) % count($pal)];
-}
+$_eColor = static fn(int $id, array $idx, array $pal): string =>
+    $pal[($idx[$id] ?? 0) % count($pal)];
 
 // 날짜별 그룹핑
 $byDate = [];
@@ -177,7 +176,7 @@ foreach ($schedules as $s) {
 <?php if (!empty($employees)): ?>
 <div class="d-flex flex-wrap gap-2 mb-3">
   <?php foreach ($employees as $e): ?>
-  <?php $ec = _eColor((int)$e['id'], $empIdx, $palette); ?>
+  <?php $ec = $_eColor((int)$e['id'], $empIdx, $palette); ?>
   <span class="badge rounded-pill d-flex align-items-center gap-1" style="background:<?= $ec ?>;font-size:.75rem">
     <?= h($e['name']) ?>
   </span>
@@ -222,7 +221,7 @@ foreach ($schedules as $s) {
                  class="text-muted" style="font-size:.7rem;line-height:1"><i class="bi bi-plus"></i></a>
             </div>
             <?php foreach ($mByDate[$dateStr] ?? [] as $s):
-              $ec = _eColor((int)$s['employee_id'], $empIdx, $palette);
+              $ec = $_eColor((int)$s['employee_id'], $empIdx, $palette);
             ?>
             <a href="<?= url('schedules', 'edit', ['id' => $s['id']]) ?>"
                class="d-block text-decoration-none text-white rounded mb-1 px-1"
