@@ -93,10 +93,16 @@
                  value="<?= h($member['employment_start_date'] ?? date('Y-m-d')) ?>">
         </div>
         <div class="col-md-6 d-flex align-items-end pb-1">
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" name="weekly_holiday_pay_enabled" value="1"
-                   <?= ($member['weekly_holiday_enabled'] ?? 1) ? 'checked' : '' ?>>
-            <label class="form-check-label">주휴수당 계산 대상</label>
+          <div>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="weeklyHolidayPay" name="weekly_holiday_pay_enabled" value="1"
+                     <?= ($member['weekly_holiday_enabled'] ?? 1) ? 'checked' : '' ?>>
+              <label class="form-check-label" for="weeklyHolidayPay">주휴수당 계산 대상</label>
+            </div>
+            <div id="holidayPayWarning" class="text-danger small mt-1" style="display:none">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              주 15시간 이상 근무자는 주휴수당 지급 의무가 있습니다 (근로기준법 제18조)
+            </div>
           </div>
         </div>
       </div>
@@ -118,3 +124,40 @@
   </div>
 </form>
 </div>
+<script>
+(function () {
+  var hoursInput   = document.querySelector('input[name="weekly_contract_hours"]');
+  var checkbox     = document.getElementById('weeklyHolidayPay');
+  var warning      = document.getElementById('holidayPayWarning');
+  var THRESHOLD    = 15;
+  var userOverride = false;
+
+  function syncCheckbox() {
+    if (userOverride) return;
+    var h = parseFloat(hoursInput.value) || 0;
+    checkbox.checked = h >= THRESHOLD;
+    warning.style.display = 'none';
+  }
+
+  hoursInput.addEventListener('input', function () {
+    userOverride = false;
+    syncCheckbox();
+  });
+
+  checkbox.addEventListener('change', function () {
+    var h = parseFloat(hoursInput.value) || 0;
+    if (!checkbox.checked && h >= THRESHOLD) {
+      warning.style.display = 'block';
+      userOverride = true;
+    } else {
+      warning.style.display = 'none';
+      userOverride = !!checkbox.checked;
+    }
+  });
+
+  // 초기 실행 (기존 직원 카드 없을 때 시간 기반 초기화)
+  <?php if (!$member): ?>
+  syncCheckbox();
+  <?php endif; ?>
+}());
+</script>
