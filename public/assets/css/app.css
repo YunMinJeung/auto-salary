@@ -380,8 +380,8 @@ main.container { padding-top: 1.75rem; padding-bottom: 2rem; }
 
 /* ─── 요약 카드 그리드 ───────────────────────────────── */
 .summary-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
