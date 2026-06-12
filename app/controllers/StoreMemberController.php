@@ -228,6 +228,96 @@ class StoreMemberController
         render('members/add_method', ['title' => '직원 추가']);
     }
 
+    public function linkAccount(): void
+    {
+        Auth::requireOwner();
+        $storeId = Auth::storeId();
+        $errors  = [];
+        $found   = null;
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            verify_csrf();
+            $action = $_POST['action'] ?? '';
+
+            if ($action === 'search') {
+                $query = trim($_POST['query'] ?? '');
+                if (!$query) {
+                    $errors[] = '사용자 ID 또는 이메일을 입력하세요.';
+                } else {
+                    $found = is_numeric($query)
+                        ? User::find((int)$query)
+                        : User::findByEmail($query);
+
+                    if (!$found) {
+                        $errors[] = '해당하는 계정을 찾을 수 없습니다.';
+                    } elseif ($found['role'] !== 'employee') {
+                        $errors[] = '알바(employee) 계정만 연결할 수 있습니다.';
+                        $found = null;
+                    } else {
+                        // 이미 이 매장에 소속된 경우 차단
+                        $dup = DB::fetchOne(
+                            "SELECT id FROM store_members WHERE store_id=? AND user_id=? AND employment_status IN ('active','on_leave')",
+                            [$storeId, $found['id']]
+                        );
+                        if ($dup) {
+                            $errors[] = '이미 이 매장에 소속된 계정입니다.';
+                            $found = null;
+                        }
+                    }
+                }
+            } elseif ($action === 'link') {
+                $userId     = (int)($_POST['user_id'] ?? 0);
+                $hourlyWage = (int)($_POST['hourly_wage'] ?? 0);
+                $user       = $userId ? User::find($userId) : null;
+
+                if (!$user || $user['role'] !== 'employee') {
+                    $errors[] = '유효하지 않은 계정입니다.';
+                } elseif ($hourlyWage < 1) {
+                    $errors[] = '시급을 입력하세요.';
+                    $found = $user;
+                } else {
+                    // 중복 재확인
+                    $dup = DB::fetchOne(
+                        "SELECT id FROM store_members WHERE store_id=? AND user_id=? AND employment_status IN ('active','on_leave')",
+                        [$storeId, $userId]
+                    );
+                    if ($dup) {
+                        $errors[] = '이미 이 매장에 소속된 계정입니다.';
+                    } else {
+                        DB::query(
+                            "INSERT INTO store_members
+                               (store_id, user_id, name, account_status, employment_status,
+                                hourly_wage, weekly_scheduled_hours, weekly_scheduled_days,
+                                weekly_holiday_enabled, employment_start_date,
+                                is_active, joined_at, created_by_user_id, created_at, updated_at)
+                             VALUES (?,?,?,'linked','active',?,?,?,?,?,1,NOW(),?,NOW(),NOW())",
+                            [
+                                $storeId,
+                                $userId,
+                                trim($_POST['name'] ?? $user['name']),
+                                $hourlyWage,
+                                (float)($_POST['weekly_contract_hours'] ?? 40),
+                                (int)($_POST['weekly_contract_days']    ?? 5),
+                                !empty($_POST['weekly_holiday_pay_enabled']) ? 1 : 0,
+                                $_POST['hire_date'] ?: date('Y-m-d'),
+                                Auth::id(),
+                            ]
+                        );
+                        flash('success', h($user['name']) . ' 님의 계정이 연결됐습니다.');
+                        redirect(url('members'));
+                    }
+                }
+            }
+        }
+
+        render('members/link_account', [
+            'title'  => '계정 ID로 연결',
+            'errors' => $errors,
+            'found'  => $found,
+            'old'    => $_POST,
+        ]);
+    }
+
     public function create(): void
     {
         Auth::requireOwner();

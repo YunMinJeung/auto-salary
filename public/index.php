@@ -348,6 +348,7 @@ try {
             switch ($a) {
                 case 'add':                $ctrl->add();              break;
                 case 'create':             $ctrl->create();           break;
+                case 'link_account':       $ctrl->linkAccount();      break;
                 case 'edit':               $ctrl->edit();             break;
                 case 'delete':             $ctrl->delete();           break;
                 case 'contract':           $ctrl->contract();         break;
