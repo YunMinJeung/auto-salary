@@ -44,7 +44,7 @@ $faqs = [
         </p>
         <div class="hero-btns">
           <a href="<?= url('signup', 'owner') ?>" class="btn-hero-primary">
-            <i class="bi bi-shop"></i>사업장 만들기
+            <i class="bi bi-shop"></i>사장님으로 시작하기
           </a>
           <a href="<?= url('signup', 'employee') ?>" class="btn-hero-outline">
             <i class="bi bi-person-badge"></i>알바로 시작하기
@@ -223,7 +223,7 @@ $faqs = [
       <?php endforeach; ?>
     </ul>
     <a href="<?= url('signup', 'owner') ?>" class="btn-role-owner">
-      <i class="bi bi-shop"></i>사업장 만들기
+      <i class="bi bi-shop"></i>사장님으로 시작하기
     </a>
   </div>
   <div class="role-panel employee">
@@ -348,7 +348,7 @@ $faqs = [
     <h2>지금 바로 무료로 시작하세요</h2>
     <p>신용카드 없이 무료 시작 &middot; 언제든 취소 가능</p>
     <a href="<?= url('signup', 'owner') ?>" class="btn-cta-white">
-      <i class="bi bi-shop"></i>사업장 만들기
+      <i class="bi bi-shop"></i>사장님으로 시작하기
     </a>
   </div>
 </section>
