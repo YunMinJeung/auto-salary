@@ -629,20 +629,20 @@ body.landing {
   background-color: var(--primary); opacity: .35;
 }
 .carousel-indicators .active { opacity: 1; }
-.carousel-control-prev,
-.carousel-control-next {
-  width: 48px; height: 48px;
+#ssCarousel .carousel-control-prev,
+#ssCarousel .carousel-control-next {
+  width: 48px !important; height: 48px !important;
   top: 50%; transform: translateY(-50%);
   background: rgba(255,255,255,.96);
   border-radius: 50%;
   box-shadow: 0 4px 20px rgba(0,0,0,.22);
   border: 1.5px solid rgba(0,0,0,.08);
-  opacity: 1;
+  opacity: 1 !important;
   z-index: 10;
   position: absolute;
 }
-.carousel-control-prev { left: 16px; }
-.carousel-control-next { right: 16px; }
+#ssCarousel .carousel-control-prev { left: 16px !important; }
+#ssCarousel .carousel-control-next { right: 16px !important; }
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
   filter: brightness(0);
