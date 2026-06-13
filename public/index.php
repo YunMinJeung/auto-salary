@@ -105,6 +105,30 @@ try {
         exit;
     }
 
+    // ─── 스크린샷 업로드 (토큰 인증, 로그인 불필요) ──────────
+    if ($c === 'ss_upload') {
+        header('Content-Type: application/json; charset=utf-8');
+        if (($_POST['token'] ?? '') !== 'ss_upload_2026_payclock') {
+            http_response_code(403); echo json_encode(['ok'=>false,'error'=>'forbidden']); exit;
+        }
+        $name = preg_replace('/[^a-z0-9_\-]/', '', $_POST['name'] ?? '');
+        if (!$name) { http_response_code(400); echo json_encode(['ok'=>false,'error'=>'no name']); exit; }
+        $dataUrl = $_POST['data'] ?? '';
+        if (!preg_match('/^data:image\/(?:png|jpeg);base64,/', $dataUrl)) {
+            http_response_code(400); echo json_encode(['ok'=>false,'error'=>'invalid']); exit;
+        }
+        $bytes = base64_decode(preg_replace('/^data:image\/(?:png|jpeg);base64,/', '', $dataUrl), true);
+        if (!$bytes || strlen($bytes) < 100) {
+            http_response_code(400); echo json_encode(['ok'=>false,'error'=>'decode']); exit;
+        }
+        $ssDir = ROOT_PATH . '/public/img/ss/';
+        if (!is_dir($ssDir)) mkdir($ssDir, 0755, true);
+        $ext = str_contains($dataUrl, 'image/png') ? 'png' : 'jpg';
+        file_put_contents($ssDir . $name . '.' . $ext, $bytes);
+        echo json_encode(['ok'=>true,'file'=>'img/ss/'.$name.'.'.$ext]);
+        exit;
+    }
+
     // ─── 알바생 전용 라우트 (employee 역할만) ────────────────
     if ($c === 'employee') {
         Auth::requireLogin();
