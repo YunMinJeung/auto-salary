@@ -621,7 +621,7 @@ body.landing {
 .footer-bottom span { font-size: .825rem; color: #475569; }
 
 /* ─── Product Preview ───────────────────────────────── */
-.product-carousel { max-width: 960px; margin: 0 auto; }
+.product-carousel { max-width: 960px; margin: 0 auto; padding-bottom: 44px; }
 .product-carousel-inner { border-radius: 0 0 16px 16px; }
 .carousel-indicators { bottom: -36px; }
 .carousel-indicators [data-bs-target] {
