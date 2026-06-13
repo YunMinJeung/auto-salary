@@ -152,9 +152,7 @@ $faqs = [
     <?php
     $ssSlides = [
       ['img/ss/ss_dashboard_01.jpg',   '대시보드 — 오늘 출근 현황 · 직원 요약'],
-      ['img/ss/ss_dashboard_02.jpg',   '대시보드 — 직원 목록 · 최근 근무기록'],
       ['img/ss/ss_attendance_01.jpg',  '출퇴근 현황 — 근무중 · 퇴근 완료 한눈에'],
-      ['img/ss/ss_schedule_week.jpg',  '근무표 주간 뷰 — 예정 인건비 자동 계산'],
       ['img/ss/ss_schedule_month.jpg', '근무표 월간 뷰 — 직원별 색상 캘린더'],
       ['img/ss/ss_employees_01.jpg',   '직원 관리 — 시급·계약 정보 일괄 관리'],
       ['img/ss/ss_payroll_weekly.jpg',  '주간 급여 — 주휴수당·야간수당 자동 적용'],
