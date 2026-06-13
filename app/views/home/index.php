@@ -148,25 +148,64 @@ $faqs = [
     <div class="section-eyebrow">PRODUCT</div>
     <h2 class="section-title">한 눈에 파악하는 사장님 대시보드</h2>
     <p class="section-lead">출퇴근 현황, 리스크 알림, 직원 관리, 인건비 차트까지 한 화면에서 바로 확인하세요.</p>
-    <div class="product-window">
-      <div class="product-chrome">
-        <div class="chrome-dots">
-          <span class="chrome-dot chrome-red"></span>
-          <span class="chrome-dot chrome-yellow"></span>
-          <span class="chrome-dot chrome-green"></span>
+
+    <?php
+    $ssSlides = [
+      ['img/ss/ss_dashboard_01.jpg',   '대시보드 — 오늘 출근 현황 · 직원 요약'],
+      ['img/ss/ss_dashboard_02.jpg',   '대시보드 — 직원 목록 · 최근 근무기록'],
+      ['img/ss/ss_attendance_01.jpg',  '출퇴근 현황 — 근무중 · 퇴근 완료 한눈에'],
+      ['img/ss/ss_schedule_week.jpg',  '근무표 주간 뷰 — 예정 인건비 자동 계산'],
+      ['img/ss/ss_schedule_month.jpg', '근무표 월간 뷰 — 직원별 색상 캘린더'],
+      ['img/ss/ss_employees_01.jpg',   '직원 관리 — 시급·계약 정보 일괄 관리'],
+      ['img/ss/ss_payroll_weekly.jpg',  '주간 급여 — 주휴수당·야간수당 자동 적용'],
+      ['img/ss/ss_payroll_monthly.jpg', '월간 급여 요약 — 4대보험 공제 포함 합산'],
+    ];
+    ?>
+
+    <div id="ssCarousel" class="carousel slide product-carousel" data-bs-ride="carousel" data-bs-interval="3500">
+      <!-- 탭 인디케이터 -->
+      <div class="carousel-indicators">
+        <?php foreach ($ssSlides as $i => $sl): ?>
+        <button type="button" data-bs-target="#ssCarousel" data-bs-slide-to="<?= $i ?>"
+          <?= $i === 0 ? 'class="active" aria-current="true"' : '' ?>
+          aria-label="<?= h($sl[1]) ?>"></button>
+        <?php endforeach; ?>
+      </div>
+
+      <!-- 슬라이드 -->
+      <div class="carousel-inner product-carousel-inner">
+        <?php foreach ($ssSlides as $i => $sl): ?>
+        <div class="carousel-item<?= $i === 0 ? ' active' : '' ?>">
+          <div class="product-window">
+            <div class="product-chrome">
+              <div class="chrome-dots">
+                <span class="chrome-dot chrome-red"></span>
+                <span class="chrome-dot chrome-yellow"></span>
+                <span class="chrome-dot chrome-green"></span>
+              </div>
+              <div class="chrome-url">페이클락 · <?= h($sl[1]) ?></div>
+              <div style="width:52px"></div>
+            </div>
+            <div class="product-viewport product-viewport-ss">
+              <img src="<?= BASE_URL . h($sl[0]) ?>"
+                   alt="<?= h($sl[1]) ?>"
+                   class="product-ss-img"
+                   loading="lazy">
+            </div>
+          </div>
         </div>
-        <div class="chrome-url">페이클락 · 사장님 대시보드</div>
-        <div style="width:52px"></div>
+        <?php endforeach; ?>
       </div>
-      <div class="product-viewport">
-        <iframe
-          class="product-frame"
-          src="<?= BASE_URL ?>preview/dashboard.html"
-          scrolling="no"
-          loading="lazy"
-          title="페이클락 대시보드 미리보기"
-        ></iframe>
-      </div>
+
+      <!-- 이전/다음 버튼 -->
+      <button class="carousel-control-prev" type="button" data-bs-target="#ssCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">이전</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#ssCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">다음</span>
+      </button>
     </div>
   </div>
 </section>

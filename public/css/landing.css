@@ -621,6 +621,27 @@ body.landing {
 .footer-bottom span { font-size: .825rem; color: #475569; }
 
 /* ─── Product Preview ───────────────────────────────── */
+.product-carousel { max-width: 960px; margin: 0 auto; }
+.product-carousel-inner { border-radius: 0 0 16px 16px; }
+.carousel-indicators { bottom: -36px; }
+.carousel-indicators [data-bs-target] {
+  width: 8px; height: 8px; border-radius: 50%;
+  background-color: var(--primary); opacity: .35;
+}
+.carousel-indicators .active { opacity: 1; }
+.carousel-control-prev,
+.carousel-control-next {
+  width: 44px; height: 44px;
+  top: 50%; transform: translateY(-50%);
+  background: rgba(255,255,255,.9);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+  opacity: 1;
+}
+.carousel-control-prev { left: -56px; }
+.carousel-control-next { right: -56px; }
+.carousel-control-prev-icon,
+.carousel-control-next-icon { filter: invert(1) brightness(0); }
 .product-window {
   border-radius: 16px;
   overflow: hidden;
@@ -652,34 +673,26 @@ body.landing {
   justify-content: center;
   font-size: .72rem;
   color: var(--text-muted);
-  max-width: 260px;
+  max-width: 360px;
   margin: 0 auto;
-}
-.product-viewport {
   overflow: hidden;
-  position: relative;
-  height: 636px;
-  background: #F7F8FA;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
-.product-frame {
-  width: 1180px;
-  height: 820px;
-  border: none;
-  transform: scale(0.78);
-  transform-origin: 0 0;
+.product-viewport { overflow: hidden; position: relative; background: #F7F8FA; }
+.product-viewport-ss { height: auto; }
+.product-ss-img {
+  width: 100%;
   display: block;
-  pointer-events: none;
-}
-@media (max-width: 1399px) {
-  .product-frame { transform: scale(0.72); }
-  .product-viewport { height: 590px; }
+  border: none;
 }
 @media (max-width: 1199px) {
-  .product-frame { transform: scale(0.62); }
-  .product-viewport { height: 508px; }
+  .carousel-control-prev { left: -8px; }
+  .carousel-control-next { right: -8px; }
 }
 @media (max-width: 767px) {
-  .product-window { display: none; }
+  .carousel-control-prev,
+  .carousel-control-next { display: none; }
 }
 
 /* ─── Signup / forms ─────────────────────────────────── */
