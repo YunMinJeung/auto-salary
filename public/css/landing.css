@@ -697,8 +697,7 @@ body.landing {
   position: absolute !important;
   top: 0;
   left: 50%;
-  /* 130%로 확대해 양쪽 페이지 빈 마진 제거 */
-  width: 130% !important;
+  width: 100% !important;
   max-width: none !important;
   height: auto;
   transform: translateX(-50%);
@@ -709,7 +708,7 @@ body.landing {
   .carousel-control-prev,
   .carousel-control-next { display: none; }
   .product-viewport-ss { height: 260px; }
-  .product-ss-img { width: 200% !important; }
+  .product-ss-img { width: 130% !important; }
 }
 
 /* ─── Signup / forms ─────────────────────────────────── */
